@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ani-Price | Token Price Tracker</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #1c2330;
+      --border: #30363d;
+      --text: #e6edf3;
+      --text-dim: #8b949e;
+      --accent: #58a6ff;
+      --green: #3fb950;
+      --red: #f85149;
+      --yellow: #d29922;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ─────────────────────────────────────── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .logo {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: -0.5px;
+    }
+
+    .logo span { color: var(--text-dim); font-weight: 400; }
+
+    /* ── Search Bar ─────────────────────────────────── */
+    .search-bar {
+      display: flex;
+      gap: 8px;
+      flex: 1;
+      max-width: 560px;
+    }
+
+    .search-bar input {
+      flex: 1;
+      padding: 10px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-bar input:focus { border-color: var(--accent); }
+
+    .search-bar input::placeholder { color: var(--text-dim); }
+
+    .btn {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .btn:hover { opacity: 0.85; }
+    .btn:disabled { opacity: 0.4; cursor: default; }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--border);
+    }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+    }
+
+    /* ── Tabs ───────────────────────────────────────── */
+    .tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      background: var(--surface);
+    }
+
+    .tab {
+      padding: 12px 20px;
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* ── Main ───────────────────────────────────────── */
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* ── Cards / Table ──────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .token-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .token-table th {
+      text-align: left;
+      padding: 10px 12px;
+      color: var(--text-dim);
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .token-table td {
+      padding: 12px;
+      font-size: 0.9rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .token-table tr:last-child td { border-bottom: none; }
+
+    .token-table tr:hover { background: var(--surface2); }
+
+    .token-name {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .token-name .symbol { font-weight: 600; }
+    .token-name .name { color: var(--text-dim); font-size: 0.8rem; }
+
+    .positive { color: var(--green); }
+    .negative { color: var(--red); }
+    .text-right { text-align: right; }
+    .text-dim { color: var(--text-dim); }
+
+    /* ── Detail Panel ──────────────────────────────── */
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .detail-grid .card h3 {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .detail-grid .card .value {
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+
+    .change-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .change-item {
+      background: var(--surface2);
+      border-radius: 8px;
+      padding: 10px 16px;
+      flex: 1;
+      min-width: 100px;
+      text-align: center;
+    }
+
+    .change-item .label {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+    }
+
+    .change-item .val { font-size: 1rem; font-weight: 600; }
+
+    /* ── Watchlist ──────────────────────────────────── */
+    .watchlist-actions {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .watchlist-actions input { flex: 1; min-width: 200px; }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--text-dim);
+    }
+
+    .empty-state p { margin-top: 8px; font-size: 0.9rem; }
+
+    /* ── Loading / Error ───────────────────────────── */
+    .loading {
+      text-align: center;
+      padding: 32px;
+      color: var(--text-dim);
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-bottom: 8px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-msg {
+      background: rgba(248, 81, 73, 0.1);
+      border: 1px solid var(--red);
+      border-radius: 8px;
+      padding: 12px 16px;
+      color: var(--red);
+      margin-bottom: 16px;
+    }
+
+    /* ── Link row ──────────────────────────────────── */
+    .link-row {
+      margin-top: 12px;
+    }
+
+    .link-row a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.85rem;
+    }
+
+    .link-row a:hover { text-decoration: underline; }
+
+    /* ── Responsive ─────────────────────────────────── */
+    @media (max-width: 640px) {
+      header { flex-direction: column; align-items: stretch; }
+      .search-bar { max-width: 100%; }
+      .detail-grid { grid-template-columns: 1fr; }
+      .token-table th:nth-child(4),
+      .token-table td:nth-child(4) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Ani-Price <span>Token Tracker</span></div>
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search token name, symbol, or paste address..." />
+    <button class="btn btn-primary" id="searchBtn">Search</button>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="tab active" data-tab="search">Search</div>
+  <div class="tab" data-tab="detail">Detail</div>
+  <div class="tab" data-tab="watchlist">Watchlist</div>
+</nav>
+
+<main>
+  <!-- ── Search Results ─────────────────────── -->
+  <section id="sec-search" class="section active">
+    <div id="searchLoading" class="loading" style="display:none">
+      <div class="spinner"></div>
+      <div>Searching...</div>
+    </div>
+    <div id="searchError" class="error-msg" style="display:none"></div>
+    <div id="searchResults"></div>
+    <div id="searchEmpty" class="empty-state">
+      <h2>Search for any token</h2>
+      <p>Enter a token name, symbol, or contract address above to get started.</p>
+    </div>
+  </section>
+
+  <!-- ── Token Detail ───────────────────────── -->
+  <section id="sec-detail" class="section">
+    <div id="detailLoading" class="loading" style="display:none">
+      <div class="spinner"></div>
+      <div>Loading token data...</div>
+    </div>
+    <div id="detailError" class="error-msg" style="display:none"></div>
+    <div id="detailContent"></div>
+    <div id="detailEmpty" class="empty-state">
+      <p>Select a token from search results to view details.</p>
+    </div>
+  </section>
+
+  <!-- ── Watchlist ──────────────────────────── -->
+  <section id="sec-watchlist" class="section">
+    <div class="watchlist-actions">
+      <input type="text" id="watchAddressInput" placeholder="Token contract address" />
+      <input type="text" id="watchLabelInput" placeholder="Label (optional)" style="max-width:160px" />
+      <button class="btn btn-primary" id="watchAddBtn">Add</button>
+      <button class="btn btn-outline" id="watchRefreshBtn">Refresh Prices</button>
+    </div>
+    <div id="watchLoading" class="loading" style="display:none">
+      <div class="spinner"></div>
+      <div>Fetching prices...</div>
+    </div>
+    <div id="watchError" class="error-msg" style="display:none"></div>
+    <div id="watchResults"></div>
+    <div id="watchEmpty" class="empty-state">
+      <h2>Your watchlist is empty</h2>
+      <p>Add token addresses above to track their prices.</p>
+    </div>
+  </section>
+</main>
+
+<script>
+const API = 'https://api.dexscreener.com';
+
+// ── Utilities ────────────────────────────────────────────────
+function formatUsd(val) {
+  if (val == null) return 'N/A';
+  const n = parseFloat(val);
+  if (isNaN(n)) return 'N/A';
+  if (n >= 1) return '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  if (n >= 0.0001) return '$' + n.toFixed(6);
+  return '$' + n.toExponential(2);
+}
+
+function formatPct(val) {
+  if (val == null) return 'N/A';
+  const sign = val >= 0 ? '+' : '';
+  return sign + val.toFixed(2) + '%';
+}
+
+function pctClass(val) {
+  if (val == null) return '';
+  return val >= 0 ? 'positive' : 'negative';
+}
+
+function formatVol(val) {
+  if (val == null) return 'N/A';
+  if (val >= 1e9) return '$' + (val / 1e9).toFixed(2) + 'B';
+  if (val >= 1e6) return '$' + (val / 1e6).toFixed(2) + 'M';
+  if (val >= 1e3) return '$' + (val / 1e3).toFixed(2) + 'K';
+  return '$' + val.toFixed(2);
+}
+
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+// ── Tabs ─────────────────────────────────────────────────────
+const tabs = document.querySelectorAll('.tab');
+const sections = document.querySelectorAll('.section');
+
+function switchTab(name) {
+  tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  sections.forEach(s => s.classList.toggle('active', s.id === 'sec-' + name));
+}
+
+tabs.forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
+
+// ── Search ───────────────────────────────────────────────────
+const searchInput = document.getElementById('searchInput');
+const searchBtn = document.getElementById('searchBtn');
+
+searchBtn.addEventListener('click', doSearch);
+searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+
+async function doSearch() {
+  const q = searchInput.value.trim();
+  if (!q) return;
+
+  switchTab('search');
+  showEl('searchLoading'); hideEl('searchError'); hideEl('searchEmpty');
+  document.getElementById('searchResults').innerHTML = '';
+
+  try {
+    // Decide if it's likely an address or a name search
+    let pairs;
+    if (q.length > 30 && !q.includes(' ')) {
+      const resp = await fetch(`${API}/tokens/v1/${q}`);
+      if (!resp.ok) throw new Error('API error ' + resp.status);
+      const data = await resp.json();
+      pairs = Array.isArray(data) ? data : (data.pairs || []);
+    } else {
+      const resp = await fetch(`${API}/latest/dex/search?q=${encodeURIComponent(q)}`);
+      if (!resp.ok) throw new Error('API error ' + resp.status);
+      const data = await resp.json();
+      pairs = data.pairs || [];
+    }
+
+    hideEl('searchLoading');
+
+    if (!pairs.length) {
+      showEl('searchEmpty');
+      document.getElementById('searchEmpty').innerHTML = `<p>No results for "${escHtml(q)}"</p>`;
+      return;
+    }
+
+    // Deduplicate by base token address, keep highest liquidity
+    const seen = {};
+    for (const p of pairs) {
+      const addr = (p.baseToken || {}).address || '';
+      const liq = ((p.liquidity || {}).usd) || 0;
+      if (!seen[addr] || liq > (((seen[addr].liquidity || {}).usd) || 0)) {
+        seen[addr] = p;
+      }
+    }
+    const unique = Object.values(seen).slice(0, 20);
+
+    renderSearchTable(unique);
+  } catch (err) {
+    hideEl('searchLoading');
+    showError('searchError', err.message);
+  }
+}
+
+function renderSearchTable(pairs) {
+  const container = document.getElementById('searchResults');
+  let html = `<table class="token-table">
+    <thead><tr>
+      <th>Token</th><th class="text-right">Price</th>
+      <th class="text-right">24h</th><th class="text-right">Volume 24h</th>
+      <th class="text-right">Liquidity</th><th>Chain</th><th></th>
+    </tr></thead><tbody>`;
+
+  for (const p of pairs) {
+    const base = p.baseToken || {};
+    const chg24 = (p.priceChange || {}).h24;
+    html += `<tr style="cursor:pointer" onclick="viewDetail('${escHtml(p.chainId)}','${escHtml(p.pairAddress)}')">
+      <td><div class="token-name"><span class="symbol">${escHtml(base.symbol || '???')}</span><span class="name">${escHtml(base.name || '')}</span></div></td>
+      <td class="text-right">${formatUsd(p.priceUsd)}</td>
+      <td class="text-right ${pctClass(chg24)}">${formatPct(chg24)}</td>
+      <td class="text-right">${formatVol((p.volume || {}).h24)}</td>
+      <td class="text-right">${formatVol((p.liquidity || {}).usd)}</td>
+      <td class="text-dim">${escHtml(p.chainId || '')}</td>
+      <td><button class="btn btn-outline btn-small" onclick="event.stopPropagation(); addToWatchlist('${escHtml(base.address || '')}','${escHtml(base.symbol || '')}')">Watch</button></td>
+    </tr>`;
+  }
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+// ── Detail ───────────────────────────────────────────────────
+async function viewDetail(chainId, pairAddress) {
+  switchTab('detail');
+  showEl('detailLoading'); hideEl('detailError'); hideEl('detailEmpty');
+  document.getElementById('detailContent').innerHTML = '';
+
+  try {
+    const resp = await fetch(`${API}/latest/dex/pairs/${chainId}/${pairAddress}`);
+    if (!resp.ok) throw new Error('API error ' + resp.status);
+    const data = await resp.json();
+    const pair = (data.pairs || [])[0];
+    hideEl('detailLoading');
+
+    if (!pair) {
+      showEl('detailEmpty');
+      return;
+    }
+
+    renderDetail(pair);
+  } catch (err) {
+    hideEl('detailLoading');
+    showError('detailError', err.message);
+  }
+}
+
+function renderDetail(p) {
+  const base = p.baseToken || {};
+  const quote = p.quoteToken || {};
+  const chg = p.priceChange || {};
+  const vol = p.volume || {};
+  const liq = p.liquidity || {};
+  const txns = (p.txns || {}).h24 || {};
+
+  const container = document.getElementById('detailContent');
+  container.innerHTML = `
+    <div class="card">
+      <h2>${escHtml(base.name || 'Unknown')} (${escHtml(base.symbol || '???')})</h2>
+      <p class="text-dim" style="margin-top:4px">${escHtml(p.chainId || '')} &middot; ${escHtml(p.dexId || '')} &middot; Pair: ${escHtml(p.pairAddress || '')}</p>
+    </div>
+
+    <div class="detail-grid">
+      <div class="card"><h3>Price (USD)</h3><div class="value">${formatUsd(p.priceUsd)}</div></div>
+      <div class="card"><h3>Price (${escHtml(quote.symbol || 'Native')})</h3><div class="value">${escHtml(p.priceNative || 'N/A')}</div></div>
+      <div class="card"><h3>Market Cap</h3><div class="value">${formatVol(p.marketCap)}</div></div>
+      <div class="card"><h3>FDV</h3><div class="value">${formatVol(p.fdv)}</div></div>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size:0.8rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">Price Change</h3>
+      <div class="change-row">
+        <div class="change-item"><div class="label">5m</div><div class="val ${pctClass(chg.m5)}">${formatPct(chg.m5)}</div></div>
+        <div class="change-item"><div class="label">1h</div><div class="val ${pctClass(chg.h1)}">${formatPct(chg.h1)}</div></div>
+        <div class="change-item"><div class="label">6h</div><div class="val ${pctClass(chg.h6)}">${formatPct(chg.h6)}</div></div>
+        <div class="change-item"><div class="label">24h</div><div class="val ${pctClass(chg.h24)}">${formatPct(chg.h24)}</div></div>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      <div class="card"><h3>Volume (24h)</h3><div class="value">${formatVol(vol.h24)}</div></div>
+      <div class="card"><h3>Liquidity</h3><div class="value">${formatVol(liq.usd)}</div></div>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size:0.8rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Transactions (24h)</h3>
+      <p><span class="positive">${(txns.buys || 0).toLocaleString()} buys</span> &nbsp;/&nbsp; <span class="negative">${(txns.sells || 0).toLocaleString()} sells</span></p>
+    </div>
+
+    ${p.url ? `<div class="link-row"><a href="${escHtml(p.url)}" target="_blank" rel="noopener">View on DexScreener &rarr;</a></div>` : ''}
+  `;
+}
+
+// ── Watchlist ────────────────────────────────────────────────
+const WATCHLIST_KEY = 'aniPriceWatchlist';
+
+function getWatchlist() {
+  try { return JSON.parse(localStorage.getItem(WATCHLIST_KEY)) || []; }
+  catch { return []; }
+}
+
+function saveWatchlist(wl) {
+  localStorage.setItem(WATCHLIST_KEY, JSON.stringify(wl));
+}
+
+function addToWatchlist(address, label) {
+  if (!address) return;
+  const wl = getWatchlist();
+  if (wl.some(e => e.address.toLowerCase() === address.toLowerCase())) {
+    alert('Already in watchlist');
+    return;
+  }
+  wl.push({ address, label: label || '' });
+  saveWatchlist(wl);
+  alert((label || address.slice(0, 10) + '...') + ' added to watchlist');
+}
+
+document.getElementById('watchAddBtn').addEventListener('click', () => {
+  const addr = document.getElementById('watchAddressInput').value.trim();
+  const label = document.getElementById('watchLabelInput').value.trim();
+  if (!addr) return;
+  addToWatchlist(addr, label);
+  document.getElementById('watchAddressInput').value = '';
+  document.getElementById('watchLabelInput').value = '';
+  renderWatchlist();
+});
+
+document.getElementById('watchRefreshBtn').addEventListener('click', fetchWatchlistPrices);
+
+// When switching to watchlist tab, render it
+document.querySelector('[data-tab="watchlist"]').addEventListener('click', () => {
+  renderWatchlist();
+  fetchWatchlistPrices();
+});
+
+function renderWatchlist() {
+  const wl = getWatchlist();
+  const container = document.getElementById('watchResults');
+  const empty = document.getElementById('watchEmpty');
+
+  if (!wl.length) {
+    container.innerHTML = '';
+    showEl('watchEmpty');
+    return;
+  }
+  hideEl('watchEmpty');
+}
+
+async function fetchWatchlistPrices() {
+  const wl = getWatchlist();
+  if (!wl.length) {
+    document.getElementById('watchResults').innerHTML = '';
+    showEl('watchEmpty');
+    return;
+  }
+
+  hideEl('watchEmpty'); hideEl('watchError');
+  showEl('watchLoading');
+
+  try {
+    // Batch up to 30
+    const addresses = wl.map(e => e.address);
+    const batches = [];
+    for (let i = 0; i < addresses.length; i += 30) {
+      batches.push(addresses.slice(i, i + 30));
+    }
+
+    let allPairs = [];
+    for (const batch of batches) {
+      const resp = await fetch(`${API}/tokens/v1/${batch.join(',')}`);
+      if (!resp.ok) throw new Error('API error ' + resp.status);
+      const data = await resp.json();
+      const pairs = Array.isArray(data) ? data : (data.pairs || []);
+      allPairs = allPairs.concat(pairs);
+    }
+
+    // Group by base token address, pick best pair
+    const byAddr = {};
+    for (const p of allPairs) {
+      const addr = ((p.baseToken || {}).address || '').toLowerCase();
+      const liq = ((p.liquidity || {}).usd) || 0;
+      if (!byAddr[addr] || liq > (((byAddr[addr].liquidity || {}).usd) || 0)) {
+        byAddr[addr] = p;
+      }
+    }
+
+    hideEl('watchLoading');
+
+    // Build table
+    let html = `<table class="token-table">
+      <thead><tr>
+        <th>Token</th><th class="text-right">Price</th>
+        <th class="text-right">24h</th><th class="text-right">Volume 24h</th>
+        <th class="text-right">Liquidity</th><th></th>
+      </tr></thead><tbody>`;
+
+    for (const entry of wl) {
+      const p = byAddr[entry.address.toLowerCase()];
+      if (p) {
+        const base = p.baseToken || {};
+        const chg24 = (p.priceChange || {}).h24;
+        const label = entry.label || base.symbol || entry.address.slice(0, 10) + '...';
+        html += `<tr style="cursor:pointer" onclick="viewDetail('${escHtml(p.chainId)}','${escHtml(p.pairAddress)}')">
+          <td><div class="token-name"><span class="symbol">${escHtml(label)}</span><span class="name">${escHtml(base.name || '')}</span></div></td>
+          <td class="text-right">${formatUsd(p.priceUsd)}</td>
+          <td class="text-right ${pctClass(chg24)}">${formatPct(chg24)}</td>
+          <td class="text-right">${formatVol((p.volume || {}).h24)}</td>
+          <td class="text-right">${formatVol((p.liquidity || {}).usd)}</td>
+          <td><button class="btn btn-outline btn-small" onclick="event.stopPropagation(); removeFromWatchlist('${escHtml(entry.address)}')">Remove</button></td>
+        </tr>`;
+      } else {
+        const label = entry.label || entry.address.slice(0, 10) + '...';
+        html += `<tr>
+          <td><div class="token-name"><span class="symbol">${escHtml(label)}</span><span class="name text-dim">No data</span></div></td>
+          <td colspan="4" class="text-dim">No pair data found</td>
+          <td><button class="btn btn-outline btn-small" onclick="removeFromWatchlist('${escHtml(entry.address)}')">Remove</button></td>
+        </tr>`;
+      }
+    }
+
+    html += '</tbody></table>';
+    document.getElementById('watchResults').innerHTML = html;
+  } catch (err) {
+    hideEl('watchLoading');
+    showError('watchError', err.message);
+  }
+}
+
+function removeFromWatchlist(address) {
+  let wl = getWatchlist();
+  wl = wl.filter(e => e.address.toLowerCase() !== address.toLowerCase());
+  saveWatchlist(wl);
+  fetchWatchlistPrices();
+}
+
+// ── Helpers ──────────────────────────────────────────────────
+function showEl(id) { document.getElementById(id).style.display = ''; }
+function hideEl(id) { document.getElementById(id).style.display = 'none'; }
+function showError(id, msg) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.style.display = '';
+}
+</script>
+
+</body>
+</html>

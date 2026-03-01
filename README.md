@@ -2,7 +2,7 @@
 
 Token price tracker powered by the [DexScreener API](https://docs.dexscreener.com/api/reference).
 
-Track token prices, search for tokens, and manage a personal watchlist — all from the command line.
+Track token prices, search for tokens, and manage a personal watchlist — via the web UI or the command line.
 
 ## Features
 
@@ -12,14 +12,23 @@ Track token prices, search for tokens, and manage a personal watchlist — all f
 - **Watchlist** — save tokens you care about and check all their prices at once
 - **Multi-chain** — supports Ethereum, Solana, BSC, Arbitrum, Base, and all chains indexed by DexScreener
 
-## Installation
+## Web UI
+
+Open `index.html` in your browser — no server or build step needed. Features:
+
+- Search tokens by name, symbol, or contract address
+- View detailed price, volume, liquidity, and transaction data
+- Manage a watchlist (stored in localStorage)
+- Click any token row to see full details
+
+## CLI Installation
 
 ```bash
 pip install -r requirements.txt
 pip install -e .
 ```
 
-## Usage
+## CLI Usage
 
 ### Get a token's price
 
@@ -68,9 +77,10 @@ No API key required. DexScreener's public API is free with a rate limit of 300 r
 ## Project Structure
 
 ```
+index.html            # Web UI (single-page app)
 ani_price/
-├── __init__.py    # Package metadata
-├── api.py         # DexScreener API client
-├── tracker.py     # Price tracker, watchlist, formatting
-└── cli.py         # Command-line interface
+├── __init__.py       # Package metadata
+├── api.py            # DexScreener API client
+├── tracker.py        # Price tracker, watchlist, formatting
+└── cli.py            # Command-line interface
 ```
