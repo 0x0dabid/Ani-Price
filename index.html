@@ -1,719 +1,670 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ani-Price | Token Price Tracker</title>
-  <style>
-    :root {
-      --bg: #0d1117;
-      --surface: #161b22;
-      --surface2: #1c2330;
-      --border: #30363d;
-      --text: #e6edf3;
-      --text-dim: #8b949e;
-      --accent: #58a6ff;
-      --green: #3fb950;
-      --red: #f85149;
-      --yellow: #d29922;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ani-Price | Crypto Prices</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #e8e8f8;
+  --border: #3a3acc;
+  --border-light: #7777cc;
+  --header-bg: linear-gradient(180deg, #c8c8f0 0%, #b0b0e8 100%);
+  --green: #00cc55;
+  --red: #dd2233;
+  --yellow: #ffcc00;
+  --card-bg: #f4f4ff;
+  --text-dark: #1a1a3a;
+  --accent-blue: #3344dd;
+  --glow-green: #00ff88;
+  --panel-bg: linear-gradient(135deg, #e0e0f8 0%, #d0d0f0 50%, #c8c8ec 100%);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Nunito',sans-serif; background:var(--bg); color:var(--text-dark); min-height:100vh; }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+/* ===== HEADER ===== */
+.header {
+  background: var(--header-bg);
+  border: 3px solid var(--border);
+  border-bottom: 4px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 20px; gap: 12px;
+  box-shadow: 0 2px 8px rgba(50,50,150,0.15);
+}
+.logo {
+  font-family: 'Fredoka One', cursive;
+  font-size: 1.6rem;
+  background: linear-gradient(180deg, #ff6644 0%, #ff3388 40%, #cc2266 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(1px 2px 0px rgba(0,0,0,0.2));
+  letter-spacing: -0.5px;
+  cursor: pointer;
+}
+.mcap-info { font-size:0.85rem; color:#555; font-weight:700; }
+.mcap-info .val { color:#cc6600; font-weight:900; }
+.mcap-info .chg { color:var(--green); font-weight:800; }
+.header-right { display:flex; align-items:center; gap:10px; }
+.header-nav a { color:#333; text-decoration:none; font-weight:800; font-size:0.95rem; }
+.sign-in-btn {
+  background: linear-gradient(180deg, #ffcc44, #ffaa22);
+  color: #333; padding: 6px 18px; border-radius: 6px;
+  font-weight: 900; font-size: 0.85rem;
+  border: 2px solid #cc8800; cursor: pointer;
+  text-decoration: none; display: inline-block;
+  box-shadow: 0 2px 0 #aa7700;
+  transition: transform 0.1s;
+}
+.sign-in-btn:hover { transform: translateY(-1px); }
+.view-toggle { display:flex; }
+.vbtn {
+  padding:4px 12px; font-family:'Nunito',sans-serif; font-weight:800; font-size:0.7rem;
+  border:2px solid var(--border-light); background:#ddddf8; color:#888; cursor:pointer;
+  transition: all 0.15s; letter-spacing:0.5px;
+}
+.vbtn:first-child { border-radius:4px 0 0 4px; }
+.vbtn:last-child { border-radius:0 4px 4px 0; }
+.vbtn.active { background:var(--accent-blue); color:#fff; border-color:var(--accent-blue); }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-    }
+/* ===== PAGES ===== */
+.page { display:none; }
+.page.active { display:block; }
 
-    /* ── Header ─────────────────────────────────────── */
-    header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 16px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
+/* ===== HOME PAGE ===== */
+.watchlist-section {
+  margin:16px 20px; border:3px solid var(--border); border-radius:8px;
+  background: var(--card-bg); overflow:hidden;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5), 0 3px 10px rgba(50,50,150,0.1);
+}
+.watchlist-label {
+  background: linear-gradient(90deg, #ddddf8, #e8e8ff);
+  padding:7px 14px; font-weight:900; font-size:0.8rem; letter-spacing:1px;
+  border-bottom:2px solid var(--border); color:#555;
+}
+.watchlist-body { display:flex; }
+.watchlist-left { flex:1; padding:16px 20px; min-width:0; }
+.watchlist-right {
+  width:280px; border-left:2px solid var(--border);
+  display:flex; flex-direction:column; overflow:hidden;
+  transition: width 0.3s, opacity 0.25s;
+}
+.watchlist-right.hidden { width:0; border-left-width:0; opacity:0; pointer-events:none; }
 
-    .logo {
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: var(--accent);
-      letter-spacing: -0.5px;
-    }
+.coin-head { display:flex; align-items:center; gap:10px; margin-bottom:2px; }
+.ci { width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1rem;color:#fff;flex-shrink:0; }
+.ci.btc{background:linear-gradient(135deg,#f7931a,#e8860a)}.ci.eth{background:linear-gradient(135deg,#627eea,#4a6bd6)}.ci.bnb{background:linear-gradient(135deg,#f3ba2f,#e0a800)}.ci.sol{background:linear-gradient(135deg,#9945ff,#14f195)}.ci.xrp{background:linear-gradient(135deg,#2a2a2a,#555)}.ci.ada{background:linear-gradient(135deg,#0033ad,#0055ff)}.ci.doge{background:linear-gradient(135deg,#c2a633,#ba9f33)}.ci.avax{background:linear-gradient(135deg,#e84142,#c0292a)}.ci.dot{background:linear-gradient(135deg,#e6007a,#cc006b)}.ci.link{background:linear-gradient(135deg,#2a5ada,#1e4ac0)}
+.coin-head h2 { font-size:1.4rem; font-weight:800; }
+.wprice {
+  font-family:'Fredoka One',cursive; font-size:2.6rem;
+  color:var(--yellow); text-shadow:2px 2px 0 #cc9900,3px 3px 0 rgba(0,0,0,0.08);
+  line-height:1.1;
+}
+.wchange { font-size:1rem; font-weight:800; margin-left:8px; }
+.wchange.up{color:var(--green)}.wchange.down{color:var(--red)}
+.wchange .per{color:#888;font-weight:600}
 
-    .logo span { color: var(--text-dim); font-weight: 400; }
+.mchart { width:100%;height:160px;margin-top:12px;border-radius:4px;overflow:hidden; }
+.mchart canvas { width:100%;height:100%; }
+.cdates { display:flex;justify-content:space-between;padding:4px 0 0;font-size:0.75rem;color:#999;font-weight:700; }
 
-    /* ── Search Bar ─────────────────────────────────── */
-    .search-bar {
-      display: flex;
-      gap: 8px;
-      flex: 1;
-      max-width: 560px;
-    }
+/* Side panel rows */
+.sr { display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #e0e0f0;cursor:pointer;transition:background 0.15s;white-space:nowrap; }
+.sr:hover{background:#f0f0ff}.sr.act{background:#e8e8ff}
+.sr:last-child{border-bottom:none}
+.sr-left{display:flex;align-items:center;gap:8px}
+.sr-icon{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:0.75rem;color:#fff}
+.sr-info{display:flex;flex-direction:column}
+.sr-sym{font-weight:900;font-size:0.9rem}.sr-mc{font-size:0.7rem;color:#999;font-weight:700}
+.sr-price{font-weight:900;font-size:1.05rem}
+.sr-price.g{color:var(--green)}.sr-price.b{color:var(--accent-blue)}.sr-price.r{color:var(--red)}
 
-    .search-bar input {
-      flex: 1;
-      padding: 10px 14px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      font-size: 0.95rem;
-      outline: none;
-      transition: border-color 0.2s;
-    }
+/* TABLE */
+.tsec {
+  margin:16px 20px; border:3px solid var(--border); border-radius:8px;
+  background:var(--card-bg); overflow:hidden;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5), 0 3px 10px rgba(50,50,150,0.1);
+}
+.ttabs { display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:2px solid var(--border);background:#f6f6ff; }
+.tbtn { padding:6px 18px;font-weight:800;font-size:0.85rem;border:2px solid var(--accent-blue);background:var(--accent-blue);color:#fff;border-radius:6px;font-family:'Nunito',sans-serif; }
+.tr-right{display:flex;align-items:center;gap:8px}
+.sbox{padding:7px 12px;border:2px solid #ccc;border-radius:6px;font-size:0.8rem;font-family:'Nunito',sans-serif;font-weight:600;width:180px;outline:none}
+.sbox:focus{border-color:var(--accent-blue)}
+.cmpbtn{padding:7px 16px;background:var(--accent-blue);color:#fff;border:2px solid #4455dd;border-radius:6px;font-weight:800;font-size:0.8rem;cursor:pointer;font-family:'Nunito',sans-serif}
+table.ct{width:100%;border-collapse:collapse}
+.ct thead th{text-align:left;padding:10px 14px;font-weight:800;font-size:0.8rem;color:#777;border-bottom:2px solid #eee;background:#fafafe}
+.ct tbody tr{border-bottom:1px solid #f0f0f0;cursor:pointer;transition:background 0.12s}
+.ct tbody tr:hover{background:#f4f4ff}
+.ct tbody td{padding:12px 14px;font-weight:700;font-size:0.9rem}
+.rn{font-weight:900;color:#999;width:20px;display:inline-block}
+.ea{color:#ccc;margin:0 5px;font-size:0.6rem}
+.cnc{display:flex;align-items:center;gap:8px}
+.cnc .ci{width:28px;height:28px;font-size:0.75rem}
+.cnt{font-weight:800;font-size:0.95rem}
+.chc{font-weight:800;display:flex;align-items:center;gap:3px}
+.chc.up{color:var(--green)}.chc.down{color:var(--red)}
+.mc{font-weight:700;color:#666}
+.slc{width:90px;height:28px}.slc svg{width:100%;height:100%}
 
-    .search-bar input:focus { border-color: var(--accent); }
+/* ===== DETAIL PAGE ===== */
+.detail-card {
+  margin:16px 20px; border:3px solid var(--border); border-radius:10px;
+  background: var(--panel-bg);
+  overflow:hidden;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.6), 0 4px 16px rgba(50,50,150,0.12);
+}
+.detail-top { padding:16px 20px; }
+.detail-head { display:flex; align-items:center; justify-content:space-between; }
+.detail-coin { display:flex; align-items:center; gap:12px; }
+.detail-coin .ci { width:48px;height:48px;font-size:1.3rem; }
+.detail-name { font-size:1.5rem; font-weight:900; }
+.detail-sym { font-size:0.85rem; color:#888; font-weight:700; }
+.detail-actions { display:flex; gap:8px; }
+.detail-act {
+  width:36px;height:36px;border:2px solid var(--border-light);border-radius:6px;
+  background:#fff;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:1rem;transition:background 0.15s;
+}
+.detail-act:hover{background:#eef}
+.detail-price-row { display:flex;align-items:baseline;gap:12px;margin-top:8px; }
+.detail-price {
+  font-family:'Fredoka One',cursive; font-size:2.8rem;
+  background: linear-gradient(180deg, #ffdd44 0%, #ff9922 100%);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  filter:drop-shadow(2px 2px 0 rgba(200,130,0,0.3));
+  line-height:1.1;
+}
+.detail-badge {
+  padding:5px 16px; border-radius:20px; font-weight:900; font-size:0.95rem;
+  display:inline-flex;align-items:center;
+}
+.detail-badge.up { background:#00cc55; color:#fff; }
+.detail-badge.down { background:#dd2233; color:#fff; }
 
-    .search-bar input::placeholder { color: var(--text-dim); }
+/* Time range selector */
+.time-range { display:flex;gap:0;margin-top:14px;margin-bottom:10px; }
+.tr-btn {
+  padding:6px 16px; font-family:'Nunito',sans-serif; font-weight:800; font-size:0.8rem;
+  border:2px solid var(--border-light); background:#e0e0f4; color:#888;
+  cursor:pointer; transition:all 0.15s;
+}
+.tr-btn:first-child{border-radius:6px 0 0 6px}
+.tr-btn:last-child{border-radius:0 6px 6px 0}
+.tr-btn.active { background:var(--accent-blue); color:#fff; border-color:var(--accent-blue); }
+.tr-btn:hover:not(.active){background:#d0d0ee;color:#555}
 
-    .btn {
-      padding: 10px 18px;
-      border: none;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity 0.15s;
-    }
+.chart-controls { display:flex;align-items:center;justify-content:space-between;margin-bottom:4px; }
+.chart-mode { display:flex;gap:0; }
+.cm-btn {
+  padding:4px 12px;font-family:'Nunito',sans-serif;font-weight:800;font-size:0.75rem;
+  border:2px solid var(--border-light);background:#fff;color:#888;cursor:pointer;
+}
+.cm-btn:first-child{border-radius:4px 0 0 4px}.cm-btn:last-child{border-radius:0 4px 4px 0}
+.cm-btn.active{background:var(--accent-blue);color:#fff;border-color:var(--accent-blue)}
 
-    .btn:hover { opacity: 0.85; }
-    .btn:disabled { opacity: 0.4; cursor: default; }
+/* Detail Chart */
+.detail-chart-wrap {
+  position:relative; width:100%; height:320px;
+  border:2px solid var(--border); border-radius:8px;
+  background: linear-gradient(180deg, #1a1a3a 0%, #0a2a2a 100%);
+  overflow:hidden;
+}
+.detail-chart-canvas { width:100%;height:100%; }
 
-    .btn-primary {
-      background: var(--accent);
-      color: var(--bg);
-    }
+/* Grid overlay */
+.chart-grid {
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  pointer-events:none;
+}
 
-    .btn-outline {
-      background: transparent;
-      color: var(--accent);
-      border: 1px solid var(--border);
-    }
+/* Price axis on right */
+.price-axis {
+  position:absolute;top:0;right:0;bottom:30px;width:60px;
+  display:flex;flex-direction:column;justify-content:space-between;
+  padding:8px 4px;pointer-events:none;
+}
+.price-tick {
+  font-family:'Orbitron',monospace;font-size:0.55rem;color:rgba(0,255,136,0.5);
+  text-align:right;font-weight:700;
+}
 
-    .btn-small {
-      padding: 6px 12px;
-      font-size: 0.8rem;
-    }
+/* Current price label */
+.price-now {
+  position:absolute;right:0;
+  background:#00cc55;color:#fff;
+  padding:2px 8px;border-radius:3px;
+  font-family:'Orbitron',monospace;font-size:0.65rem;font-weight:900;
+  box-shadow:0 0 8px rgba(0,255,100,0.4);
+}
 
-    /* ── Tabs ───────────────────────────────────────── */
-    .tabs {
-      display: flex;
-      gap: 0;
-      border-bottom: 1px solid var(--border);
-      padding: 0 24px;
-      background: var(--surface);
-    }
+/* Time axis */
+.time-axis {
+  position:absolute;bottom:0;left:0;right:60px;height:28px;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:0 12px;pointer-events:none;
+}
+.time-tick {
+  font-family:'Orbitron',monospace;font-size:0.55rem;color:rgba(0,255,136,0.4);font-weight:700;
+}
 
-    .tab {
-      padding: 12px 20px;
-      color: var(--text-dim);
-      font-size: 0.9rem;
-      font-weight: 500;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      transition: color 0.15s, border-color 0.15s;
-    }
+/* Crosshair */
+.crosshair-v {
+  position:absolute;top:0;bottom:28px;width:1px;
+  border-left:1px dashed rgba(0,200,255,0.4);
+  pointer-events:none;display:none;
+}
+.crosshair-label {
+  position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);
+  background:rgba(30,30,80,0.9);color:#aaf;padding:1px 6px;border-radius:3px;
+  font-family:'Orbitron',monospace;font-size:0.55rem;font-weight:700;white-space:nowrap;
+}
 
-    .tab:hover { color: var(--text); }
-    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+/* KEY STATS */
+.key-stats {
+  margin:16px 20px; border:3px solid var(--border); border-radius:10px;
+  background:var(--panel-bg); overflow:hidden;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,0.6),0 3px 10px rgba(50,50,150,0.1);
+}
+.ks-label {
+  background:linear-gradient(90deg,#ff44aa,#ff6688);
+  padding:6px 14px;font-weight:900;font-size:0.8rem;color:#fff;letter-spacing:1px;
+}
+.ks-grid {
+  display:grid;grid-template-columns:repeat(6,1fr);gap:0;padding:12px;
+}
+.ks-item {
+  border:2px solid var(--border-light);border-radius:8px;
+  background:linear-gradient(180deg,#e8e8ff,#d8d8f4);
+  padding:12px 10px;text-align:center;margin:4px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.7);
+}
+.ks-title { font-size:0.65rem;font-weight:800;color:#888;letter-spacing:0.5px;margin-bottom:4px; }
+.ks-value { font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--text-dark); }
+.ks-sub { font-size:0.65rem;color:#999;font-weight:700;margin-top:2px; }
+.ks-sub.red{color:var(--red)}.ks-sub.green{color:var(--green)}
 
-    /* ── Main ───────────────────────────────────────── */
-    main {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 24px;
-    }
+.back-btn {
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 18px;background:#fff;border:2px solid var(--border-light);
+  border-radius:8px;font-weight:800;font-size:0.85rem;cursor:pointer;
+  margin:16px 20px 0;transition:all 0.15s;font-family:'Nunito',sans-serif;
+  color:var(--text-dark);
+}
+.back-btn:hover{background:#f0f0ff;border-color:var(--accent-blue)}
 
-    .section { display: none; }
-    .section.active { display: block; }
+.footer { text-align:center;padding:20px;color:#aaa;font-size:0.75rem;font-weight:700; }
 
-    /* ── Cards / Table ──────────────────────────────── */
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 16px;
-    }
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.anim{animation:slideUp 0.4s ease-out}
 
-    .token-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .token-table th {
-      text-align: left;
-      padding: 10px 12px;
-      color: var(--text-dim);
-      font-size: 0.8rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .token-table td {
-      padding: 12px;
-      font-size: 0.9rem;
-      border-bottom: 1px solid var(--border);
-      vertical-align: middle;
-    }
-
-    .token-table tr:last-child td { border-bottom: none; }
-
-    .token-table tr:hover { background: var(--surface2); }
-
-    .token-name {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .token-name .symbol { font-weight: 600; }
-    .token-name .name { color: var(--text-dim); font-size: 0.8rem; }
-
-    .positive { color: var(--green); }
-    .negative { color: var(--red); }
-    .text-right { text-align: right; }
-    .text-dim { color: var(--text-dim); }
-
-    /* ── Detail Panel ──────────────────────────────── */
-    .detail-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .detail-grid .card h3 {
-      font-size: 0.8rem;
-      color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 8px;
-    }
-
-    .detail-grid .card .value {
-      font-size: 1.3rem;
-      font-weight: 700;
-    }
-
-    .change-row {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .change-item {
-      background: var(--surface2);
-      border-radius: 8px;
-      padding: 10px 16px;
-      flex: 1;
-      min-width: 100px;
-      text-align: center;
-    }
-
-    .change-item .label {
-      font-size: 0.75rem;
-      color: var(--text-dim);
-      margin-bottom: 4px;
-    }
-
-    .change-item .val { font-size: 1rem; font-weight: 600; }
-
-    /* ── Watchlist ──────────────────────────────────── */
-    .watchlist-actions {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-    }
-
-    .watchlist-actions input { flex: 1; min-width: 200px; }
-
-    .empty-state {
-      text-align: center;
-      padding: 48px 20px;
-      color: var(--text-dim);
-    }
-
-    .empty-state p { margin-top: 8px; font-size: 0.9rem; }
-
-    /* ── Loading / Error ───────────────────────────── */
-    .loading {
-      text-align: center;
-      padding: 32px;
-      color: var(--text-dim);
-    }
-
-    .spinner {
-      display: inline-block;
-      width: 24px;
-      height: 24px;
-      border: 3px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      margin-bottom: 8px;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .error-msg {
-      background: rgba(248, 81, 73, 0.1);
-      border: 1px solid var(--red);
-      border-radius: 8px;
-      padding: 12px 16px;
-      color: var(--red);
-      margin-bottom: 16px;
-    }
-
-    /* ── Link row ──────────────────────────────────── */
-    .link-row {
-      margin-top: 12px;
-    }
-
-    .link-row a {
-      color: var(--accent);
-      text-decoration: none;
-      font-size: 0.85rem;
-    }
-
-    .link-row a:hover { text-decoration: underline; }
-
-    /* ── Responsive ─────────────────────────────────── */
-    @media (max-width: 640px) {
-      header { flex-direction: column; align-items: stretch; }
-      .search-bar { max-width: 100%; }
-      .detail-grid { grid-template-columns: 1fr; }
-      .token-table th:nth-child(4),
-      .token-table td:nth-child(4) { display: none; }
-    }
-  </style>
+@media(max-width:768px){
+  .header{flex-wrap:wrap;padding:8px 10px}
+  .watchlist-body{flex-direction:column}
+  .watchlist-right{width:100%!important;border-left:none!important;border-top:2px solid var(--border)}
+  .watchlist-right.hidden{height:0;border-top:none}
+  .wprice,.detail-price{font-size:2rem}
+  .ks-grid{grid-template-columns:repeat(3,1fr)}
+  .detail-chart-wrap{height:220px}
+  .tsec,.watchlist-section,.detail-card,.key-stats{margin:10px 8px}
+  .slc{display:none}
+}
+</style>
 </head>
 <body>
 
-<header>
-  <div class="logo">Ani-Price <span>Token Tracker</span></div>
-  <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Search token name, symbol, or paste address..." />
-    <button class="btn btn-primary" id="searchBtn">Search</button>
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left" style="display:flex;align-items:center;gap:14px">
+    <div class="logo" onclick="goHome()">Ani-price</div>
+    <div class="mcap-info">mcap: <span class="val">$2.36T</span> <span class="chg">▲ 3.5%</span></div>
   </div>
-</header>
-
-<nav class="tabs">
-  <div class="tab active" data-tab="search">Search</div>
-  <div class="tab" data-tab="detail">Detail</div>
-  <div class="tab" data-tab="watchlist">Watchlist</div>
-</nav>
-
-<main>
-  <!-- ── Search Results ─────────────────────── -->
-  <section id="sec-search" class="section active">
-    <div id="searchLoading" class="loading" style="display:none">
-      <div class="spinner"></div>
-      <div>Searching...</div>
+  <div class="header-right">
+    <div class="header-nav"><a href="#" onclick="goHome();return false">Prices</a></div>
+    <a href="#" class="sign-in-btn">Sign In</a>
+    <div class="view-toggle" id="viewToggle">
+      <button class="vbtn active" id="bFull" onclick="setView('full')">FULL</button>
+      <button class="vbtn" id="bSplit" onclick="setView('split')">SPLIT</button>
     </div>
-    <div id="searchError" class="error-msg" style="display:none"></div>
-    <div id="searchResults"></div>
-    <div id="searchEmpty" class="empty-state">
-      <h2>Search for any token</h2>
-      <p>Enter a token name, symbol, or contract address above to get started.</p>
+  </div>
+</div>
+
+<!-- ===== HOME PAGE ===== -->
+<div class="page active" id="homePage">
+  <div class="watchlist-section anim">
+    <div class="watchlist-label">WATCHLIST</div>
+    <div class="watchlist-body">
+      <div class="watchlist-left">
+        <div class="coin-head">
+          <div class="ci btc" id="wIcon">₿</div>
+          <h2 id="wName">Bitcoin</h2>
+        </div>
+        <div style="display:flex;align-items:baseline;flex-wrap:wrap;gap:6px">
+          <div class="wprice" id="wPrice">$66,460.04</div>
+          <div class="wchange up" id="wChange">▲ 4.63% <span class="per">(1d)</span></div>
+        </div>
+        <div class="mchart"><canvas id="homeChart"></canvas></div>
+        <div class="cdates"><span>10:15 AM</span><span>12:15 PM</span><span>02:15 PM</span><span>04:18 PM</span></div>
+      </div>
+      <div class="watchlist-right hidden" id="sidePanel"></div>
     </div>
-  </section>
+  </div>
 
-  <!-- ── Token Detail ───────────────────────── -->
-  <section id="sec-detail" class="section">
-    <div id="detailLoading" class="loading" style="display:none">
-      <div class="spinner"></div>
-      <div>Loading token data...</div>
-    </div>
-    <div id="detailError" class="error-msg" style="display:none"></div>
-    <div id="detailContent"></div>
-    <div id="detailEmpty" class="empty-state">
-      <p>Select a token from search results to view details.</p>
-    </div>
-  </section>
-
-  <!-- ── Watchlist ──────────────────────────── -->
-  <section id="sec-watchlist" class="section">
-    <div class="watchlist-actions">
-      <input type="text" id="watchAddressInput" placeholder="Token contract address" />
-      <input type="text" id="watchLabelInput" placeholder="Label (optional)" style="max-width:160px" />
-      <button class="btn btn-primary" id="watchAddBtn">Add</button>
-      <button class="btn btn-outline" id="watchRefreshBtn">Refresh Prices</button>
-    </div>
-    <div id="watchLoading" class="loading" style="display:none">
-      <div class="spinner"></div>
-      <div>Fetching prices...</div>
-    </div>
-    <div id="watchError" class="error-msg" style="display:none"></div>
-    <div id="watchResults"></div>
-    <div id="watchEmpty" class="empty-state">
-      <h2>Your watchlist is empty</h2>
-      <p>Add token addresses above to track their prices.</p>
-    </div>
-  </section>
-</main>
-
-<script>
-const API = 'https://api.dexscreener.com';
-
-// ── Utilities ────────────────────────────────────────────────
-function formatUsd(val) {
-  if (val == null) return 'N/A';
-  const n = parseFloat(val);
-  if (isNaN(n)) return 'N/A';
-  if (n >= 1) return '$' + n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  if (n >= 0.0001) return '$' + n.toFixed(6);
-  return '$' + n.toExponential(2);
-}
-
-function formatPct(val) {
-  if (val == null) return 'N/A';
-  const sign = val >= 0 ? '+' : '';
-  return sign + val.toFixed(2) + '%';
-}
-
-function pctClass(val) {
-  if (val == null) return '';
-  return val >= 0 ? 'positive' : 'negative';
-}
-
-function formatVol(val) {
-  if (val == null) return 'N/A';
-  if (val >= 1e9) return '$' + (val / 1e9).toFixed(2) + 'B';
-  if (val >= 1e6) return '$' + (val / 1e6).toFixed(2) + 'M';
-  if (val >= 1e3) return '$' + (val / 1e3).toFixed(2) + 'K';
-  return '$' + val.toFixed(2);
-}
-
-function escHtml(s) {
-  const d = document.createElement('div');
-  d.textContent = s;
-  return d.innerHTML;
-}
-
-// ── Tabs ─────────────────────────────────────────────────────
-const tabs = document.querySelectorAll('.tab');
-const sections = document.querySelectorAll('.section');
-
-function switchTab(name) {
-  tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === name));
-  sections.forEach(s => s.classList.toggle('active', s.id === 'sec-' + name));
-}
-
-tabs.forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
-
-// ── Search ───────────────────────────────────────────────────
-const searchInput = document.getElementById('searchInput');
-const searchBtn = document.getElementById('searchBtn');
-
-searchBtn.addEventListener('click', doSearch);
-searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
-
-async function doSearch() {
-  const q = searchInput.value.trim();
-  if (!q) return;
-
-  switchTab('search');
-  showEl('searchLoading'); hideEl('searchError'); hideEl('searchEmpty');
-  document.getElementById('searchResults').innerHTML = '';
-
-  try {
-    // Decide if it's likely an address or a name search
-    let pairs;
-    if (q.length > 30 && !q.includes(' ')) {
-      const resp = await fetch(`${API}/tokens/v1/${q}`);
-      if (!resp.ok) throw new Error('API error ' + resp.status);
-      const data = await resp.json();
-      pairs = Array.isArray(data) ? data : (data.pairs || []);
-    } else {
-      const resp = await fetch(`${API}/latest/dex/search?q=${encodeURIComponent(q)}`);
-      if (!resp.ok) throw new Error('API error ' + resp.status);
-      const data = await resp.json();
-      pairs = data.pairs || [];
-    }
-
-    hideEl('searchLoading');
-
-    if (!pairs.length) {
-      showEl('searchEmpty');
-      document.getElementById('searchEmpty').innerHTML = `<p>No results for "${escHtml(q)}"</p>`;
-      return;
-    }
-
-    // Deduplicate by base token address, keep highest liquidity
-    const seen = {};
-    for (const p of pairs) {
-      const addr = (p.baseToken || {}).address || '';
-      const liq = ((p.liquidity || {}).usd) || 0;
-      if (!seen[addr] || liq > (((seen[addr].liquidity || {}).usd) || 0)) {
-        seen[addr] = p;
-      }
-    }
-    const unique = Object.values(seen).slice(0, 20);
-
-    renderSearchTable(unique);
-  } catch (err) {
-    hideEl('searchLoading');
-    showError('searchError', err.message);
-  }
-}
-
-function renderSearchTable(pairs) {
-  const container = document.getElementById('searchResults');
-  let html = `<table class="token-table">
-    <thead><tr>
-      <th>Token</th><th class="text-right">Price</th>
-      <th class="text-right">24h</th><th class="text-right">Volume 24h</th>
-      <th class="text-right">Liquidity</th><th>Chain</th><th></th>
-    </tr></thead><tbody>`;
-
-  for (const p of pairs) {
-    const base = p.baseToken || {};
-    const chg24 = (p.priceChange || {}).h24;
-    html += `<tr style="cursor:pointer" onclick="viewDetail('${escHtml(p.chainId)}','${escHtml(p.pairAddress)}')">
-      <td><div class="token-name"><span class="symbol">${escHtml(base.symbol || '???')}</span><span class="name">${escHtml(base.name || '')}</span></div></td>
-      <td class="text-right">${formatUsd(p.priceUsd)}</td>
-      <td class="text-right ${pctClass(chg24)}">${formatPct(chg24)}</td>
-      <td class="text-right">${formatVol((p.volume || {}).h24)}</td>
-      <td class="text-right">${formatVol((p.liquidity || {}).usd)}</td>
-      <td class="text-dim">${escHtml(p.chainId || '')}</td>
-      <td><button class="btn btn-outline btn-small" onclick="event.stopPropagation(); addToWatchlist('${escHtml(base.address || '')}','${escHtml(base.symbol || '')}')">Watch</button></td>
-    </tr>`;
-  }
-
-  html += '</tbody></table>';
-  container.innerHTML = html;
-}
-
-// ── Detail ───────────────────────────────────────────────────
-async function viewDetail(chainId, pairAddress) {
-  switchTab('detail');
-  showEl('detailLoading'); hideEl('detailError'); hideEl('detailEmpty');
-  document.getElementById('detailContent').innerHTML = '';
-
-  try {
-    const resp = await fetch(`${API}/latest/dex/pairs/${chainId}/${pairAddress}`);
-    if (!resp.ok) throw new Error('API error ' + resp.status);
-    const data = await resp.json();
-    const pair = (data.pairs || [])[0];
-    hideEl('detailLoading');
-
-    if (!pair) {
-      showEl('detailEmpty');
-      return;
-    }
-
-    renderDetail(pair);
-  } catch (err) {
-    hideEl('detailLoading');
-    showError('detailError', err.message);
-  }
-}
-
-function renderDetail(p) {
-  const base = p.baseToken || {};
-  const quote = p.quoteToken || {};
-  const chg = p.priceChange || {};
-  const vol = p.volume || {};
-  const liq = p.liquidity || {};
-  const txns = (p.txns || {}).h24 || {};
-
-  const container = document.getElementById('detailContent');
-  container.innerHTML = `
-    <div class="card">
-      <h2>${escHtml(base.name || 'Unknown')} (${escHtml(base.symbol || '???')})</h2>
-      <p class="text-dim" style="margin-top:4px">${escHtml(p.chainId || '')} &middot; ${escHtml(p.dexId || '')} &middot; Pair: ${escHtml(p.pairAddress || '')}</p>
-    </div>
-
-    <div class="detail-grid">
-      <div class="card"><h3>Price (USD)</h3><div class="value">${formatUsd(p.priceUsd)}</div></div>
-      <div class="card"><h3>Price (${escHtml(quote.symbol || 'Native')})</h3><div class="value">${escHtml(p.priceNative || 'N/A')}</div></div>
-      <div class="card"><h3>Market Cap</h3><div class="value">${formatVol(p.marketCap)}</div></div>
-      <div class="card"><h3>FDV</h3><div class="value">${formatVol(p.fdv)}</div></div>
-    </div>
-
-    <div class="card">
-      <h3 style="font-size:0.8rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px">Price Change</h3>
-      <div class="change-row">
-        <div class="change-item"><div class="label">5m</div><div class="val ${pctClass(chg.m5)}">${formatPct(chg.m5)}</div></div>
-        <div class="change-item"><div class="label">1h</div><div class="val ${pctClass(chg.h1)}">${formatPct(chg.h1)}</div></div>
-        <div class="change-item"><div class="label">6h</div><div class="val ${pctClass(chg.h6)}">${formatPct(chg.h6)}</div></div>
-        <div class="change-item"><div class="label">24h</div><div class="val ${pctClass(chg.h24)}">${formatPct(chg.h24)}</div></div>
+  <div class="tsec anim">
+    <div class="ttabs">
+      <div><button class="tbtn">Crypto</button></div>
+      <div class="tr-right">
+        <input type="text" class="sbox" placeholder="🔍 Search by name or CA" id="searchBox" oninput="filterTable()">
+        <button class="cmpbtn">Compare</button>
       </div>
     </div>
+    <table class="ct">
+      <thead><tr><th style="width:45px"></th><th>Name</th><th>Price</th><th>% Change</th><th>Market Cap</th><th>Weekly Trend</th></tr></thead>
+      <tbody id="tBody"></tbody>
+    </table>
+  </div>
+</div>
 
-    <div class="detail-grid">
-      <div class="card"><h3>Volume (24h)</h3><div class="value">${formatVol(vol.h24)}</div></div>
-      <div class="card"><h3>Liquidity</h3><div class="value">${formatVol(liq.usd)}</div></div>
+<!-- ===== DETAIL PAGE ===== -->
+<div class="page" id="detailPage">
+  <button class="back-btn" onclick="goHome()">← Back to Prices</button>
+
+  <div class="detail-card anim">
+    <div class="detail-top">
+      <div class="detail-head">
+        <div class="detail-coin">
+          <div class="ci btc" id="dIcon">₿</div>
+          <div>
+            <div class="detail-name" id="dName">Bitcoin</div>
+            <div class="detail-sym" id="dSym">BTC</div>
+          </div>
+        </div>
+        <div class="detail-actions">
+          <div class="detail-act">⭐</div>
+          <div class="detail-act">📤</div>
+        </div>
+      </div>
+      <div class="detail-price-row">
+        <div class="detail-price" id="dPrice">$66,502.93</div>
+        <div class="detail-badge up" id="dBadge">+4.29%</div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px">
+        <div class="time-range" id="timeRange">
+          <button class="tr-btn" data-r="1H">1H</button>
+          <button class="tr-btn" data-r="6H">6H</button>
+          <button class="tr-btn active" data-r="1D">1D</button>
+          <button class="tr-btn" data-r="1W">1W</button>
+          <button class="tr-btn" data-r="1M">1M</button>
+          <button class="tr-btn" data-r="1Y">1Y</button>
+          <button class="tr-btn" data-r="ALL">ALL</button>
+        </div>
+        <div class="chart-mode">
+          <button class="cm-btn active">Chart</button>
+          <button class="cm-btn">TV</button>
+        </div>
+      </div>
+
+      <!-- DETAIL CHART -->
+      <div class="detail-chart-wrap" id="dChartWrap">
+        <canvas class="detail-chart-canvas" id="dChart"></canvas>
+        <div class="price-axis" id="priceAxis"></div>
+        <div class="price-now" id="priceNow">$66.6K</div>
+        <div class="time-axis" id="timeAxis"></div>
+        <div class="crosshair-v" id="crossV"><div class="crosshair-label" id="crossLabel">23:55</div></div>
+      </div>
     </div>
+  </div>
 
-    <div class="card">
-      <h3 style="font-size:0.8rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Transactions (24h)</h3>
-      <p><span class="positive">${(txns.buys || 0).toLocaleString()} buys</span> &nbsp;/&nbsp; <span class="negative">${(txns.sells || 0).toLocaleString()} sells</span></p>
-    </div>
+  <!-- KEY STATS -->
+  <div class="key-stats anim">
+    <div class="ks-label">KEY STATS</div>
+    <div class="ks-grid" id="ksGrid"></div>
+  </div>
+</div>
 
-    ${p.url ? `<div class="link-row"><a href="${escHtml(p.url)}" target="_blank" rel="noopener">View on DexScreener &rarr;</a></div>` : ''}
+<div class="footer">Ani-Price © 2026 — Crypto prices for informational purposes only.</div>
+
+<script>
+// ==================== DATA ====================
+const coins = [
+  { rank:1,name:'Bitcoin',symbol:'BTC',icon:'₿',cls:'btc',price:66502.93,change:4.29,mcap:'$1.33T',fdv:'$1.33T',vol:'$46.39B',volChg:'+2.8%',ath:'$126,080.00',athDiff:'47.2%',circ:'20.00M',circPct:'95.2%',trend:'up' },
+  { rank:2,name:'Ethereum',symbol:'ETH',icon:'Ξ',cls:'eth',price:1980.14,change:7.00,mcap:'$238.78B',fdv:'$238.78B',vol:'$18.2B',volChg:'+5.1%',ath:'$4,891.70',athDiff:'59.5%',circ:'120.2M',circPct:'100%',trend:'up' },
+  { rank:3,name:'BNB',symbol:'BNB',icon:'B',cls:'bnb',price:620.93,change:5.40,mcap:'$84.62B',fdv:'$84.62B',vol:'$2.1B',volChg:'+1.3%',ath:'$793.35',athDiff:'21.7%',circ:'140.6M',circPct:'70.3%',trend:'down' },
+  { rank:4,name:'Solana',symbol:'SOL',icon:'S',cls:'sol',price:181.37,change:7.53,mcap:'$58.77B',fdv:'$107B',vol:'$4.8B',volChg:'+8.2%',ath:'$295.83',athDiff:'38.7%',circ:'440M',circPct:'75.1%',trend:'up' },
+  { rank:5,name:'XRP',symbol:'XRP',icon:'X',cls:'xrp',price:0.5234,change:-1.23,mcap:'$28.45B',fdv:'$52.3B',vol:'$1.2B',volChg:'-0.5%',ath:'$3.40',athDiff:'84.6%',circ:'54.3B',circPct:'54.3%',trend:'down' },
+  { rank:6,name:'Cardano',symbol:'ADA',icon:'A',cls:'ada',price:0.3821,change:3.44,mcap:'$13.52B',fdv:'$17.2B',vol:'$420M',volChg:'+3.1%',ath:'$3.10',athDiff:'87.7%',circ:'35.4B',circPct:'78.7%',trend:'up' },
+  { rank:7,name:'Dogecoin',symbol:'DOGE',icon:'D',cls:'doge',price:0.0823,change:-2.15,mcap:'$11.74B',fdv:'$11.74B',vol:'$680M',volChg:'-1.2%',ath:'$0.7376',athDiff:'88.8%',circ:'142.8B',circPct:'100%',trend:'down' },
+  { rank:8,name:'Avalanche',symbol:'AVAX',icon:'A',cls:'avax',price:24.87,change:4.21,mcap:'$9.82B',fdv:'$17.8B',vol:'$510M',volChg:'+2.4%',ath:'$146.22',athDiff:'83.0%',circ:'394.6M',circPct:'54.9%',trend:'up' },
+  { rank:9,name:'Polkadot',symbol:'DOT',icon:'●',cls:'dot',price:5.42,change:-0.88,mcap:'$7.35B',fdv:'$7.72B',vol:'$195M',volChg:'-0.3%',ath:'$55.00',athDiff:'90.1%',circ:'1.36B',circPct:'95.2%',trend:'down' },
+  { rank:10,name:'Chainlink',symbol:'LINK',icon:'⬡',cls:'link',price:13.21,change:6.10,mcap:'$7.12B',fdv:'$13.2B',vol:'$620M',volChg:'+4.7%',ath:'$52.88',athDiff:'75.0%',circ:'538.1M',circPct:'53.8%',trend:'up' },
+];
+
+let currentWatch='bitcoin', currentView='full';
+
+// ==================== HOME ====================
+function goHome(){
+  document.getElementById('homePage').classList.add('active');
+  document.getElementById('detailPage').classList.remove('active');
+  document.getElementById('viewToggle').style.display='flex';
+  setTimeout(()=>drawHomeChart(),50);
+}
+
+function setView(m){
+  currentView=m;
+  document.getElementById('bFull').classList.toggle('active',m==='full');
+  document.getElementById('bSplit').classList.toggle('active',m==='split');
+  const p=document.getElementById('sidePanel');
+  m==='split'?p.classList.remove('hidden'):p.classList.add('hidden');
+  setTimeout(()=>drawHomeChart(),60);
+}
+
+function buildSide(){
+  const p=document.getElementById('sidePanel');
+  const cols=['b','g','r','g','b'];
+  p.innerHTML=coins.slice(0,5).map((c,i)=>`
+    <div class="sr ${c.name.toLowerCase()===currentWatch?'act':''}" onclick="setWatch('${c.name.toLowerCase()}')">
+      <div class="sr-left">
+        <div class="sr-icon ci ${c.cls}">${c.icon}</div>
+        <div class="sr-info"><span class="sr-sym">${c.symbol}</span><span class="sr-mc">${c.mcap}</span></div>
+      </div>
+      <div class="sr-price ${cols[i]}">$${c.price>=1000?c.price.toLocaleString('en-US',{maximumFractionDigits:0}):c.price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+    </div>`).join('');
+}
+
+function setWatch(id){
+  currentWatch=id;
+  const c=coins.find(d=>d.name.toLowerCase()===id);if(!c)return;
+  document.getElementById('wName').textContent=c.name;
+  document.getElementById('wPrice').textContent='$'+c.price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const el=document.getElementById('wChange'),up=c.change>=0;
+  el.className='wchange '+(up?'up':'down');
+  el.innerHTML=`${up?'▲':'▼'} ${Math.abs(c.change).toFixed(2)}% <span class="per">(1d)</span>`;
+  document.getElementById('wIcon').className='ci '+c.cls;
+  document.getElementById('wIcon').textContent=c.icon;
+  buildSide(); drawHomeChart();
+}
+
+function drawHomeChart(){
+  const c=coins.find(d=>d.name.toLowerCase()===currentWatch);
+  const trend=c?c.trend:'up';
+  const canvas=document.getElementById('homeChart');
+  const ctx=canvas.getContext('2d'),dpr=window.devicePixelRatio||1;
+  const rect=canvas.getBoundingClientRect();
+  canvas.width=rect.width*dpr;canvas.height=rect.height*dpr;ctx.scale(dpr,dpr);
+  const w=rect.width,h=rect.height,pts=[];let v=h*0.5;
+  for(let i=0;i<=120;i++){v+=(Math.random()-(trend==='up'?0.42:0.58))*(h*0.05);v=Math.max(h*0.08,Math.min(h*0.88,v));pts.push({x:(i/120)*w,y:v})}
+  const g=ctx.createLinearGradient(0,0,0,h);
+  g.addColorStop(0,'rgba(0,180,100,0.5)');g.addColorStop(0.4,'rgba(0,200,150,0.3)');g.addColorStop(1,'rgba(0,220,240,0.08)');
+  ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
+  for(let i=1;i<pts.length;i++){const cx=(pts[i-1].x+pts[i].x)/2;ctx.bezierCurveTo(cx,pts[i-1].y,cx,pts[i].y,pts[i].x,pts[i].y)}
+  ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();ctx.fillStyle=g;ctx.fill();
+  ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
+  for(let i=1;i<pts.length;i++){const cx=(pts[i-1].x+pts[i].x)/2;ctx.bezierCurveTo(cx,pts[i-1].y,cx,pts[i].y,pts[i].x,pts[i].y)}
+  ctx.strokeStyle='#00cc66';ctx.lineWidth=2;ctx.stroke();
+}
+
+// Table
+function renderTable(data){
+  document.getElementById('tBody').innerHTML=data.map(c=>`
+    <tr onclick="openDetail('${c.name.toLowerCase()}')">
+      <td><span class="rn">${c.rank}</span><span class="ea">◆</span></td>
+      <td><div class="cnc"><div class="ci ${c.cls}">${c.icon}</div><span class="cnt">${c.name}</span></div></td>
+      <td style="font-weight:800">$${c.price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+      <td><div class="chc ${c.change>=0?'up':'down'}">${c.change>=0?'▲':'▼'} ${Math.abs(c.change).toFixed(2)}%</div></td>
+      <td class="mc">${c.mcap}</td>
+      <td class="slc">${mkSpk(c.trend)}</td>
+    </tr>`).join('');
+}
+function mkSpk(t){const p=[];let v=50;for(let i=0;i<24;i++){v+=(Math.random()-(t==='up'?0.4:0.6))*8;v=Math.max(8,Math.min(92,v));p.push(v)}
+const d=p.map((y,i)=>`${i===0?'M':'L'}${(i/23)*100},${100-y}`).join(' ');
+return `<svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="${d}" fill="none" stroke="${t==='up'?'#00aa44':'#cc2222'}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
+function filterTable(){const q=document.getElementById('searchBox').value.toLowerCase();renderTable(coins.filter(c=>c.name.toLowerCase().includes(q)||c.symbol.toLowerCase().includes(q)))}
+
+// ==================== DETAIL PAGE ====================
+let detailCoin=null, chartPoints=[];
+
+function openDetail(id){
+  detailCoin=coins.find(c=>c.name.toLowerCase()===id);
+  if(!detailCoin)return;
+  document.getElementById('homePage').classList.remove('active');
+  document.getElementById('detailPage').classList.add('active');
+  document.getElementById('viewToggle').style.display='none';
+
+  document.getElementById('dName').textContent=detailCoin.name;
+  document.getElementById('dSym').textContent=detailCoin.symbol;
+  document.getElementById('dPrice').textContent='$'+detailCoin.price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  document.getElementById('dIcon').className='ci '+detailCoin.cls;
+  document.getElementById('dIcon').textContent=detailCoin.icon;
+
+  const badge=document.getElementById('dBadge');
+  const up=detailCoin.change>=0;
+  badge.className='detail-badge '+(up?'up':'down');
+  badge.textContent=(up?'+':'')+detailCoin.change.toFixed(2)+'%';
+
+  // Key stats
+  document.getElementById('ksGrid').innerHTML=`
+    <div class="ks-item"><div class="ks-title">RANK</div><div class="ks-value">#${detailCoin.rank}</div></div>
+    <div class="ks-item"><div class="ks-title">MARKET CAP</div><div class="ks-value">${detailCoin.mcap}</div></div>
+    <div class="ks-item"><div class="ks-title">FDV</div><div class="ks-value">${detailCoin.fdv}</div><div class="ks-sub">= Market Cap</div></div>
+    <div class="ks-item"><div class="ks-title">VOLUME 24H</div><div class="ks-value">${detailCoin.vol}</div><div class="ks-sub green">${detailCoin.volChg}</div></div>
+    <div class="ks-item"><div class="ks-title">ATH</div><div class="ks-value">${detailCoin.ath}</div><div class="ks-sub red">${detailCoin.athDiff} below ATH</div></div>
+    <div class="ks-item"><div class="ks-title">CIRCULATING</div><div class="ks-value">${detailCoin.circ}</div><div class="ks-sub">${detailCoin.circPct} of max</div></div>
   `;
+
+  // Time range buttons
+  document.querySelectorAll('.tr-btn').forEach(b=>{
+    b.onclick=()=>{document.querySelectorAll('.tr-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');drawDetailChart()}
+  });
+
+  setTimeout(()=>drawDetailChart(),80);
 }
 
-// ── Watchlist ────────────────────────────────────────────────
-const WATCHLIST_KEY = 'aniPriceWatchlist';
+function drawDetailChart(){
+  const canvas=document.getElementById('dChart');
+  const ctx=canvas.getContext('2d'),dpr=window.devicePixelRatio||1;
+  const wrap=document.getElementById('dChartWrap');
+  const rect=wrap.getBoundingClientRect();
+  canvas.width=rect.width*dpr;canvas.height=rect.height*dpr;
+  ctx.scale(dpr,dpr);
+  const w=rect.width-60,h=rect.height-30;
 
-function getWatchlist() {
-  try { return JSON.parse(localStorage.getItem(WATCHLIST_KEY)) || []; }
-  catch { return []; }
-}
-
-function saveWatchlist(wl) {
-  localStorage.setItem(WATCHLIST_KEY, JSON.stringify(wl));
-}
-
-function addToWatchlist(address, label) {
-  if (!address) return;
-  const wl = getWatchlist();
-  if (wl.some(e => e.address.toLowerCase() === address.toLowerCase())) {
-    alert('Already in watchlist');
-    return;
+  // Generate data
+  chartPoints=[];let v=h*0.6;
+  const trend=detailCoin?detailCoin.trend:'up';
+  for(let i=0;i<=200;i++){
+    v+=(Math.random()-(trend==='up'?0.43:0.57))*(h*0.04);
+    v=Math.max(h*0.05,Math.min(h*0.92,v));
+    chartPoints.push({x:(i/200)*w,y:v});
   }
-  wl.push({ address, label: label || '' });
-  saveWatchlist(wl);
-  alert((label || address.slice(0, 10) + '...') + ' added to watchlist');
+
+  // Grid
+  ctx.strokeStyle='rgba(0,255,136,0.06)';ctx.lineWidth=0.5;
+  for(let i=0;i<=10;i++){const y=(i/10)*h;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
+  for(let i=0;i<=12;i++){const x=(i/12)*w;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}
+
+  // Glow effect
+  const glowGrad=ctx.createLinearGradient(0,0,0,h);
+  glowGrad.addColorStop(0,'rgba(0,255,136,0.25)');
+  glowGrad.addColorStop(0.4,'rgba(0,200,120,0.15)');
+  glowGrad.addColorStop(0.7,'rgba(0,180,100,0.06)');
+  glowGrad.addColorStop(1,'rgba(0,150,80,0.01)');
+
+  ctx.beginPath();ctx.moveTo(chartPoints[0].x,chartPoints[0].y);
+  for(let i=1;i<chartPoints.length;i++){const cx=(chartPoints[i-1].x+chartPoints[i].x)/2;ctx.bezierCurveTo(cx,chartPoints[i-1].y,cx,chartPoints[i].y,chartPoints[i].x,chartPoints[i].y)}
+  ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();ctx.fillStyle=glowGrad;ctx.fill();
+
+  // Line with glow
+  ctx.shadowColor='rgba(0,255,136,0.6)';ctx.shadowBlur=8;
+  ctx.beginPath();ctx.moveTo(chartPoints[0].x,chartPoints[0].y);
+  for(let i=1;i<chartPoints.length;i++){const cx=(chartPoints[i-1].x+chartPoints[i].x)/2;ctx.bezierCurveTo(cx,chartPoints[i-1].y,cx,chartPoints[i].y,chartPoints[i].x,chartPoints[i].y)}
+  ctx.strokeStyle='#00ff88';ctx.lineWidth=2;ctx.stroke();
+  ctx.shadowBlur=0;
+
+  // White highlight
+  ctx.beginPath();ctx.moveTo(chartPoints[0].x,chartPoints[0].y-1);
+  for(let i=1;i<chartPoints.length;i++){const cx=(chartPoints[i-1].x+chartPoints[i].x)/2;ctx.bezierCurveTo(cx,chartPoints[i-1].y-1,cx,chartPoints[i].y-1,chartPoints[i].x,chartPoints[i].y-1)}
+  ctx.strokeStyle='rgba(255,255,255,0.25)';ctx.lineWidth=0.8;ctx.stroke();
+
+  // Dotted current price line
+  const lastY=chartPoints[chartPoints.length-1].y;
+  ctx.setLineDash([4,4]);ctx.strokeStyle='rgba(0,255,136,0.3)';ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(0,lastY);ctx.lineTo(w,lastY);ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Bright dots at peaks
+  for(let i=2;i<chartPoints.length-2;i++){
+    if(chartPoints[i].y<chartPoints[i-1].y&&chartPoints[i].y<chartPoints[i+1].y&&Math.random()>0.7){
+      ctx.beginPath();ctx.arc(chartPoints[i].x,chartPoints[i].y,2,0,Math.PI*2);
+      ctx.fillStyle='rgba(0,255,200,0.7)';ctx.fill();
+    }
+  }
+
+  // Price axis
+  const minY=Math.min(...chartPoints.map(p=>p.y));
+  const maxY=Math.max(...chartPoints.map(p=>p.y));
+  const pBase=detailCoin?detailCoin.price:66500;
+  const pRange=pBase*0.08;
+  const axis=document.getElementById('priceAxis');
+  let ticks='';
+  for(let i=0;i<=8;i++){
+    const pv=pBase+pRange*(1-i/4);
+    ticks+=`<div class="price-tick">${pv>=1000?'$'+(pv/1000).toFixed(1)+'K':'$'+pv.toFixed(2)}</div>`;
+  }
+  axis.innerHTML=ticks;
+
+  // Current price label position
+  const pnow=document.getElementById('priceNow');
+  const pct=(lastY-0)/(h);
+  pnow.style.top=Math.min(Math.max(pct*100,5),90)+'%';
+  const pDisp=detailCoin?detailCoin.price:66600;
+  pnow.textContent=pDisp>=1000?'$'+(pDisp/1000).toFixed(1)+'K':'$'+pDisp.toFixed(2);
+
+  // Time axis
+  const times=['18:31','21:00','23:55','03:01','06:00','09:00','12:01','18:01'];
+  document.getElementById('timeAxis').innerHTML=times.map(t=>`<span class="time-tick">${t}</span>`).join('');
 }
 
-document.getElementById('watchAddBtn').addEventListener('click', () => {
-  const addr = document.getElementById('watchAddressInput').value.trim();
-  const label = document.getElementById('watchLabelInput').value.trim();
-  if (!addr) return;
-  addToWatchlist(addr, label);
-  document.getElementById('watchAddressInput').value = '';
-  document.getElementById('watchLabelInput').value = '';
-  renderWatchlist();
+// Crosshair on hover
+document.getElementById('dChartWrap').addEventListener('mousemove',e=>{
+  const wrap=document.getElementById('dChartWrap');
+  const rect=wrap.getBoundingClientRect();
+  const x=e.clientX-rect.left;
+  const cv=document.getElementById('crossV');
+  cv.style.display='block';cv.style.left=x+'px';
+  const pct=x/rect.width;
+  const hours=Math.floor(pct*24);const mins=Math.floor((pct*24-hours)*60);
+  document.getElementById('crossLabel').textContent=`${String(hours).padStart(2,'0')}:${String(mins).padStart(2,'0')}`;
+});
+document.getElementById('dChartWrap').addEventListener('mouseleave',()=>{
+  document.getElementById('crossV').style.display='none';
 });
 
-document.getElementById('watchRefreshBtn').addEventListener('click', fetchWatchlistPrices);
-
-// When switching to watchlist tab, render it
-document.querySelector('[data-tab="watchlist"]').addEventListener('click', () => {
-  renderWatchlist();
-  fetchWatchlistPrices();
+// ==================== INIT ====================
+buildSide();renderTable(coins);drawHomeChart();
+window.addEventListener('resize',()=>{
+  if(document.getElementById('homePage').classList.contains('active'))drawHomeChart();
+  else if(detailCoin)drawDetailChart();
 });
-
-function renderWatchlist() {
-  const wl = getWatchlist();
-  const container = document.getElementById('watchResults');
-  const empty = document.getElementById('watchEmpty');
-
-  if (!wl.length) {
-    container.innerHTML = '';
-    showEl('watchEmpty');
-    return;
-  }
-  hideEl('watchEmpty');
-}
-
-async function fetchWatchlistPrices() {
-  const wl = getWatchlist();
-  if (!wl.length) {
-    document.getElementById('watchResults').innerHTML = '';
-    showEl('watchEmpty');
-    return;
-  }
-
-  hideEl('watchEmpty'); hideEl('watchError');
-  showEl('watchLoading');
-
-  try {
-    // Batch up to 30
-    const addresses = wl.map(e => e.address);
-    const batches = [];
-    for (let i = 0; i < addresses.length; i += 30) {
-      batches.push(addresses.slice(i, i + 30));
-    }
-
-    let allPairs = [];
-    for (const batch of batches) {
-      const resp = await fetch(`${API}/tokens/v1/${batch.join(',')}`);
-      if (!resp.ok) throw new Error('API error ' + resp.status);
-      const data = await resp.json();
-      const pairs = Array.isArray(data) ? data : (data.pairs || []);
-      allPairs = allPairs.concat(pairs);
-    }
-
-    // Group by base token address, pick best pair
-    const byAddr = {};
-    for (const p of allPairs) {
-      const addr = ((p.baseToken || {}).address || '').toLowerCase();
-      const liq = ((p.liquidity || {}).usd) || 0;
-      if (!byAddr[addr] || liq > (((byAddr[addr].liquidity || {}).usd) || 0)) {
-        byAddr[addr] = p;
-      }
-    }
-
-    hideEl('watchLoading');
-
-    // Build table
-    let html = `<table class="token-table">
-      <thead><tr>
-        <th>Token</th><th class="text-right">Price</th>
-        <th class="text-right">24h</th><th class="text-right">Volume 24h</th>
-        <th class="text-right">Liquidity</th><th></th>
-      </tr></thead><tbody>`;
-
-    for (const entry of wl) {
-      const p = byAddr[entry.address.toLowerCase()];
-      if (p) {
-        const base = p.baseToken || {};
-        const chg24 = (p.priceChange || {}).h24;
-        const label = entry.label || base.symbol || entry.address.slice(0, 10) + '...';
-        html += `<tr style="cursor:pointer" onclick="viewDetail('${escHtml(p.chainId)}','${escHtml(p.pairAddress)}')">
-          <td><div class="token-name"><span class="symbol">${escHtml(label)}</span><span class="name">${escHtml(base.name || '')}</span></div></td>
-          <td class="text-right">${formatUsd(p.priceUsd)}</td>
-          <td class="text-right ${pctClass(chg24)}">${formatPct(chg24)}</td>
-          <td class="text-right">${formatVol((p.volume || {}).h24)}</td>
-          <td class="text-right">${formatVol((p.liquidity || {}).usd)}</td>
-          <td><button class="btn btn-outline btn-small" onclick="event.stopPropagation(); removeFromWatchlist('${escHtml(entry.address)}')">Remove</button></td>
-        </tr>`;
-      } else {
-        const label = entry.label || entry.address.slice(0, 10) + '...';
-        html += `<tr>
-          <td><div class="token-name"><span class="symbol">${escHtml(label)}</span><span class="name text-dim">No data</span></div></td>
-          <td colspan="4" class="text-dim">No pair data found</td>
-          <td><button class="btn btn-outline btn-small" onclick="removeFromWatchlist('${escHtml(entry.address)}')">Remove</button></td>
-        </tr>`;
-      }
-    }
-
-    html += '</tbody></table>';
-    document.getElementById('watchResults').innerHTML = html;
-  } catch (err) {
-    hideEl('watchLoading');
-    showError('watchError', err.message);
-  }
-}
-
-function removeFromWatchlist(address) {
-  let wl = getWatchlist();
-  wl = wl.filter(e => e.address.toLowerCase() !== address.toLowerCase());
-  saveWatchlist(wl);
-  fetchWatchlistPrices();
-}
-
-// ── Helpers ──────────────────────────────────────────────────
-function showEl(id) { document.getElementById(id).style.display = ''; }
-function hideEl(id) { document.getElementById(id).style.display = 'none'; }
-function showError(id, msg) {
-  const el = document.getElementById(id);
-  el.textContent = msg;
-  el.style.display = '';
-}
 </script>
-
 </body>
 </html>
