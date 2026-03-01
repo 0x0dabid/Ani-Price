@@ -425,245 +425,510 @@ table.ct{width:100%;border-collapse:collapse}
 <div class="footer">Ani-Price © 2026 — Crypto prices for informational purposes only.</div>
 
 <script>
-// ==================== DATA ====================
-const coins = [
-  { rank:1,name:'Bitcoin',symbol:'BTC',icon:'₿',cls:'btc',price:66502.93,change:4.29,mcap:'$1.33T',fdv:'$1.33T',vol:'$46.39B',volChg:'+2.8%',ath:'$126,080.00',athDiff:'47.2%',circ:'20.00M',circPct:'95.2%',trend:'up' },
-  { rank:2,name:'Ethereum',symbol:'ETH',icon:'Ξ',cls:'eth',price:1980.14,change:7.00,mcap:'$238.78B',fdv:'$238.78B',vol:'$18.2B',volChg:'+5.1%',ath:'$4,891.70',athDiff:'59.5%',circ:'120.2M',circPct:'100%',trend:'up' },
-  { rank:3,name:'BNB',symbol:'BNB',icon:'B',cls:'bnb',price:620.93,change:5.40,mcap:'$84.62B',fdv:'$84.62B',vol:'$2.1B',volChg:'+1.3%',ath:'$793.35',athDiff:'21.7%',circ:'140.6M',circPct:'70.3%',trend:'down' },
-  { rank:4,name:'Solana',symbol:'SOL',icon:'S',cls:'sol',price:181.37,change:7.53,mcap:'$58.77B',fdv:'$107B',vol:'$4.8B',volChg:'+8.2%',ath:'$295.83',athDiff:'38.7%',circ:'440M',circPct:'75.1%',trend:'up' },
-  { rank:5,name:'XRP',symbol:'XRP',icon:'X',cls:'xrp',price:0.5234,change:-1.23,mcap:'$28.45B',fdv:'$52.3B',vol:'$1.2B',volChg:'-0.5%',ath:'$3.40',athDiff:'84.6%',circ:'54.3B',circPct:'54.3%',trend:'down' },
-  { rank:6,name:'Cardano',symbol:'ADA',icon:'A',cls:'ada',price:0.3821,change:3.44,mcap:'$13.52B',fdv:'$17.2B',vol:'$420M',volChg:'+3.1%',ath:'$3.10',athDiff:'87.7%',circ:'35.4B',circPct:'78.7%',trend:'up' },
-  { rank:7,name:'Dogecoin',symbol:'DOGE',icon:'D',cls:'doge',price:0.0823,change:-2.15,mcap:'$11.74B',fdv:'$11.74B',vol:'$680M',volChg:'-1.2%',ath:'$0.7376',athDiff:'88.8%',circ:'142.8B',circPct:'100%',trend:'down' },
-  { rank:8,name:'Avalanche',symbol:'AVAX',icon:'A',cls:'avax',price:24.87,change:4.21,mcap:'$9.82B',fdv:'$17.8B',vol:'$510M',volChg:'+2.4%',ath:'$146.22',athDiff:'83.0%',circ:'394.6M',circPct:'54.9%',trend:'up' },
-  { rank:9,name:'Polkadot',symbol:'DOT',icon:'●',cls:'dot',price:5.42,change:-0.88,mcap:'$7.35B',fdv:'$7.72B',vol:'$195M',volChg:'-0.3%',ath:'$55.00',athDiff:'90.1%',circ:'1.36B',circPct:'95.2%',trend:'down' },
-  { rank:10,name:'Chainlink',symbol:'LINK',icon:'⬡',cls:'link',price:13.21,change:6.10,mcap:'$7.12B',fdv:'$13.2B',vol:'$620M',volChg:'+4.7%',ath:'$52.88',athDiff:'75.0%',circ:'538.1M',circPct:'53.8%',trend:'up' },
+// ==================== DEXSCREENER API ====================
+const API = 'https://api.dexscreener.com';
+
+async function apiFetch(path) {
+  const resp = await fetch(API + path);
+  if (!resp.ok) throw new Error('API error ' + resp.status);
+  return resp.json();
+}
+
+function fmtVol(v) {
+  if (v == null) return 'N/A';
+  if (v >= 1e12) return '$' + (v/1e12).toFixed(2) + 'T';
+  if (v >= 1e9) return '$' + (v/1e9).toFixed(2) + 'B';
+  if (v >= 1e6) return '$' + (v/1e6).toFixed(2) + 'M';
+  if (v >= 1e3) return '$' + (v/1e3).toFixed(2) + 'K';
+  return '$' + v.toFixed(2);
+}
+
+function fmtPrice(v) {
+  if (v == null) return 'N/A';
+  var n = parseFloat(v);
+  if (isNaN(n)) return 'N/A';
+  if (n >= 1) return '$' + n.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  if (n >= 0.0001) return '$' + n.toFixed(6);
+  return '$' + n.toExponential(2);
+}
+
+// Pick highest-liquidity pair from a set of search results for a given symbol
+function bestPairForSymbol(pairs, symbol) {
+  var matching = pairs.filter(function(p) {
+    var bs = ((p.baseToken || {}).symbol || '').toUpperCase();
+    return bs === symbol.toUpperCase() || bs === 'W' + symbol.toUpperCase();
+  });
+  if (!matching.length) matching = pairs;
+  matching.sort(function(a, b) {
+    return (((b.liquidity || {}).usd) || 0) - (((a.liquidity || {}).usd) || 0);
+  });
+  return matching[0] || null;
+}
+
+// ==================== COIN CONFIG (styling + search terms) ====================
+var coins = [
+  { rank:1, name:'Bitcoin', symbol:'BTC', search:'WBTC', icon:'₿', cls:'btc', price:0, change:0, mcap:'--', fdv:'--', vol:'--', volH24:0, liq:'--', trend:'up', pair:null },
+  { rank:2, name:'Ethereum', symbol:'ETH', search:'WETH', icon:'Ξ', cls:'eth', price:0, change:0, mcap:'--', fdv:'--', vol:'--', volH24:0, liq:'--', trend:'up', pair:null },
+  { rank:3, name:'BNB', symbol:'BNB', search:'WBNB', icon:'B', cls:'bnb', price:0, change:0, mcap:'--', fdv:'--', vol:'--', volH24:0, liq:'--', trend:'up', pair:null },
+  { rank:4, name:'Solana', symbol:'SOL', search:'SOL', icon:'S', cls:'sol', price:0, change:0, mcap:'--', fdv:'--', vol:'--', volH24:0, liq:'--', trend:'up', pair:null },
+  { rank:5, name:'XRP', symbol:'XRP', search:'XRP', icon:'X', cls:'xrp', price:0, change:0, mcap:'--', fdv:'--', vol:'--', volH24:0, liq:'--', trend:'down', pair:null },
+  { rank:6, name:'Cardano', symbol:'ADA', search:'ADA', icon:'A', cls:'ada', price:0, change:0, mcap:'--', fdv:'--', vol:'--', volH24:0, liq:'--', trend:'up', pair:null },
+  { rank:7, name:'Dogecoin', symbol:'DOGE', search:'DOGE', icon:'D', cls:'doge', price:0, change:0, mcap:'--', fdv:'--', vol:'--', volH24:0, liq:'--', trend:'down', pair:null },
+  { rank:8, name:'Avalanche', symbol:'AVAX', search:'AVAX', icon:'A', cls:'avax', price:0, change:0, mcap:'--', fdv:'--', vol:'--', volH24:0, liq:'--', trend:'up', pair:null },
+  { rank:9, name:'Polkadot', symbol:'DOT', search:'DOT', icon:'●', cls:'dot', price:0, change:0, mcap:'--', fdv:'--', vol:'--', volH24:0, liq:'--', trend:'down', pair:null },
+  { rank:10, name:'Chainlink', symbol:'LINK', search:'LINK', icon:'⬡', cls:'link', price:0, change:0, mcap:'--', fdv:'--', vol:'--', volH24:0, liq:'--', trend:'up', pair:null },
 ];
 
-let currentWatch='bitcoin', currentView='full';
+// Extra coins found via DexScreener search (contract address search results)
+var searchResults = [];
+var displayCoins = coins; // what the table currently shows
+var isShowingSearch = false;
 
-// ==================== HOME ====================
-function goHome(){
+let currentWatch = 'bitcoin', currentView = 'full';
+
+// ==================== FETCH LIVE PRICES ====================
+async function fetchAllPrices() {
+  var promises = coins.map(function(coin) {
+    return apiFetch('/latest/dex/search?q=' + encodeURIComponent(coin.search))
+      .then(function(data) {
+        var pairs = data.pairs || [];
+        var best = bestPairForSymbol(pairs, coin.symbol);
+        if (best) {
+          coin.price = parseFloat(best.priceUsd) || 0;
+          coin.change = ((best.priceChange || {}).h24) || 0;
+          coin.trend = coin.change >= 0 ? 'up' : 'down';
+          coin.mcap = fmtVol(best.marketCap);
+          coin.fdv = fmtVol(best.fdv);
+          coin.vol = fmtVol(((best.volume || {}).h24) || 0);
+          coin.volH24 = ((best.volume || {}).h24) || 0;
+          coin.liq = fmtVol(((best.liquidity || {}).usd) || 0);
+          coin.pair = best;
+        }
+      })
+      .catch(function() { /* skip failed fetches */ });
+  });
+  await Promise.all(promises);
+
+  // Re-sort by market cap (approximate from pair data)
+  coins.sort(function(a, b) {
+    var aMcap = a.pair ? (a.pair.marketCap || 0) : 0;
+    var bMcap = b.pair ? (b.pair.marketCap || 0) : 0;
+    return bMcap - aMcap;
+  });
+  coins.forEach(function(c, i) { c.rank = i + 1; });
+
+  displayCoins = coins;
+  isShowingSearch = false;
+  renderTable(coins);
+  buildSide();
+  setWatch(currentWatch);
+}
+
+// ==================== HOME PAGE ====================
+function goHome() {
   document.getElementById('homePage').classList.add('active');
   document.getElementById('detailPage').classList.remove('active');
-  document.getElementById('viewToggle').style.display='flex';
-  setTimeout(()=>drawHomeChart(),50);
+  document.getElementById('viewToggle').style.display = 'flex';
+  if (isShowingSearch) {
+    displayCoins = coins;
+    isShowingSearch = false;
+    document.getElementById('searchBox').value = '';
+    renderTable(coins);
+  }
+  setTimeout(function() { drawHomeChart(); }, 50);
 }
 
-function setView(m){
-  currentView=m;
-  document.getElementById('bFull').classList.toggle('active',m==='full');
-  document.getElementById('bSplit').classList.toggle('active',m==='split');
-  const p=document.getElementById('sidePanel');
-  m==='split'?p.classList.remove('hidden'):p.classList.add('hidden');
-  setTimeout(()=>drawHomeChart(),60);
+function setView(m) {
+  currentView = m;
+  document.getElementById('bFull').classList.toggle('active', m === 'full');
+  document.getElementById('bSplit').classList.toggle('active', m === 'split');
+  var p = document.getElementById('sidePanel');
+  m === 'split' ? p.classList.remove('hidden') : p.classList.add('hidden');
+  setTimeout(function() { drawHomeChart(); }, 60);
 }
 
-function buildSide(){
-  const p=document.getElementById('sidePanel');
-  const cols=['b','g','r','g','b'];
-  p.innerHTML=coins.slice(0,5).map((c,i)=>`
-    <div class="sr ${c.name.toLowerCase()===currentWatch?'act':''}" onclick="setWatch('${c.name.toLowerCase()}')">
-      <div class="sr-left">
-        <div class="sr-icon ci ${c.cls}">${c.icon}</div>
-        <div class="sr-info"><span class="sr-sym">${c.symbol}</span><span class="sr-mc">${c.mcap}</span></div>
-      </div>
-      <div class="sr-price ${cols[i]}">$${c.price>=1000?c.price.toLocaleString('en-US',{maximumFractionDigits:0}):c.price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
-    </div>`).join('');
+function buildSide() {
+  var p = document.getElementById('sidePanel');
+  var cols = ['b', 'g', 'r', 'g', 'b'];
+  p.innerHTML = coins.slice(0, 5).map(function(c, i) {
+    var priceStr = c.price >= 1000
+      ? '$' + c.price.toLocaleString('en-US', {maximumFractionDigits: 0})
+      : fmtPrice(c.price);
+    return '<div class="sr ' + (c.name.toLowerCase() === currentWatch ? 'act' : '') + '" onclick="setWatch(\'' + c.name.toLowerCase() + '\')">' +
+      '<div class="sr-left">' +
+        '<div class="sr-icon ci ' + c.cls + '">' + c.icon + '</div>' +
+        '<div class="sr-info"><span class="sr-sym">' + c.symbol + '</span><span class="sr-mc">' + c.mcap + '</span></div>' +
+      '</div>' +
+      '<div class="sr-price ' + cols[i] + '">' + priceStr + '</div>' +
+    '</div>';
+  }).join('');
 }
 
-function setWatch(id){
-  currentWatch=id;
-  const c=coins.find(d=>d.name.toLowerCase()===id);if(!c)return;
-  document.getElementById('wName').textContent=c.name;
-  document.getElementById('wPrice').textContent='$'+c.price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-  const el=document.getElementById('wChange'),up=c.change>=0;
-  el.className='wchange '+(up?'up':'down');
-  el.innerHTML=`${up?'▲':'▼'} ${Math.abs(c.change).toFixed(2)}% <span class="per">(1d)</span>`;
-  document.getElementById('wIcon').className='ci '+c.cls;
-  document.getElementById('wIcon').textContent=c.icon;
-  buildSide(); drawHomeChart();
+function setWatch(id) {
+  currentWatch = id;
+  var c = coins.find(function(d) { return d.name.toLowerCase() === id; });
+  if (!c) return;
+  document.getElementById('wName').textContent = c.name;
+  document.getElementById('wPrice').textContent = fmtPrice(c.price);
+  var el = document.getElementById('wChange'), up = c.change >= 0;
+  el.className = 'wchange ' + (up ? 'up' : 'down');
+  el.innerHTML = (up ? '▲' : '▼') + ' ' + Math.abs(c.change).toFixed(2) + '% <span class="per">(24h)</span>';
+  document.getElementById('wIcon').className = 'ci ' + c.cls;
+  document.getElementById('wIcon').textContent = c.icon;
+  buildSide();
+  drawHomeChart();
 }
 
-function drawHomeChart(){
-  const c=coins.find(d=>d.name.toLowerCase()===currentWatch);
-  const trend=c?c.trend:'up';
-  const canvas=document.getElementById('homeChart');
-  const ctx=canvas.getContext('2d'),dpr=window.devicePixelRatio||1;
-  const rect=canvas.getBoundingClientRect();
-  canvas.width=rect.width*dpr;canvas.height=rect.height*dpr;ctx.scale(dpr,dpr);
-  const w=rect.width,h=rect.height,pts=[];let v=h*0.5;
-  for(let i=0;i<=120;i++){v+=(Math.random()-(trend==='up'?0.42:0.58))*(h*0.05);v=Math.max(h*0.08,Math.min(h*0.88,v));pts.push({x:(i/120)*w,y:v})}
-  const g=ctx.createLinearGradient(0,0,0,h);
-  g.addColorStop(0,'rgba(0,180,100,0.5)');g.addColorStop(0.4,'rgba(0,200,150,0.3)');g.addColorStop(1,'rgba(0,220,240,0.08)');
-  ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
-  for(let i=1;i<pts.length;i++){const cx=(pts[i-1].x+pts[i].x)/2;ctx.bezierCurveTo(cx,pts[i-1].y,cx,pts[i].y,pts[i].x,pts[i].y)}
-  ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();ctx.fillStyle=g;ctx.fill();
-  ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);
-  for(let i=1;i<pts.length;i++){const cx=(pts[i-1].x+pts[i].x)/2;ctx.bezierCurveTo(cx,pts[i-1].y,cx,pts[i].y,pts[i].x,pts[i].y)}
-  ctx.strokeStyle='#00cc66';ctx.lineWidth=2;ctx.stroke();
+function drawHomeChart() {
+  var c = coins.find(function(d) { return d.name.toLowerCase() === currentWatch; });
+  var trend = c ? c.trend : 'up';
+  var canvas = document.getElementById('homeChart');
+  var ctx = canvas.getContext('2d'), dpr = window.devicePixelRatio || 1;
+  var rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr; canvas.height = rect.height * dpr; ctx.scale(dpr, dpr);
+  var w = rect.width, h = rect.height, pts = []; var v = h * 0.5;
+  for (var i = 0; i <= 120; i++) { v += (Math.random() - (trend === 'up' ? 0.42 : 0.58)) * (h * 0.05); v = Math.max(h * 0.08, Math.min(h * 0.88, v)); pts.push({x: (i / 120) * w, y: v}); }
+  var g = ctx.createLinearGradient(0, 0, 0, h);
+  g.addColorStop(0, 'rgba(0,180,100,0.5)'); g.addColorStop(0.4, 'rgba(0,200,150,0.3)'); g.addColorStop(1, 'rgba(0,220,240,0.08)');
+  ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
+  for (var i = 1; i < pts.length; i++) { var cx = (pts[i-1].x + pts[i].x) / 2; ctx.bezierCurveTo(cx, pts[i-1].y, cx, pts[i].y, pts[i].x, pts[i].y); }
+  ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath(); ctx.fillStyle = g; ctx.fill();
+  ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
+  for (var i = 1; i < pts.length; i++) { var cx = (pts[i-1].x + pts[i].x) / 2; ctx.bezierCurveTo(cx, pts[i-1].y, cx, pts[i].y, pts[i].x, pts[i].y); }
+  ctx.strokeStyle = '#00cc66'; ctx.lineWidth = 2; ctx.stroke();
 }
 
-// Table
-function renderTable(data){
-  document.getElementById('tBody').innerHTML=data.map(c=>`
-    <tr onclick="openDetail('${c.name.toLowerCase()}')">
-      <td><span class="rn">${c.rank}</span><span class="ea">◆</span></td>
-      <td><div class="cnc"><div class="ci ${c.cls}">${c.icon}</div><span class="cnt">${c.name}</span></div></td>
-      <td style="font-weight:800">$${c.price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
-      <td><div class="chc ${c.change>=0?'up':'down'}">${c.change>=0?'▲':'▼'} ${Math.abs(c.change).toFixed(2)}%</div></td>
-      <td class="mc">${c.mcap}</td>
-      <td class="slc">${mkSpk(c.trend)}</td>
-    </tr>`).join('');
+// ==================== TABLE ====================
+function renderTable(data) {
+  document.getElementById('tBody').innerHTML = data.map(function(c) {
+    var id = c.pair ? (c.pair.chainId + '::' + c.pair.pairAddress) : c.name.toLowerCase();
+    var priceStr = c.price ? fmtPrice(c.price) : '--';
+    return '<tr onclick="openDetail(\'' + id.replace(/'/g, "\\'") + '\')">' +
+      '<td><span class="rn">' + c.rank + '</span><span class="ea">◆</span></td>' +
+      '<td><div class="cnc"><div class="ci ' + c.cls + '">' + c.icon + '</div><span class="cnt">' + c.name + '</span></div></td>' +
+      '<td style="font-weight:800">' + priceStr + '</td>' +
+      '<td><div class="chc ' + (c.change >= 0 ? 'up' : 'down') + '">' + (c.change >= 0 ? '▲' : '▼') + ' ' + Math.abs(c.change).toFixed(2) + '%</div></td>' +
+      '<td class="mc">' + c.mcap + '</td>' +
+      '<td class="slc">' + mkSpk(c.trend) + '</td>' +
+    '</tr>';
+  }).join('');
 }
-function mkSpk(t){const p=[];let v=50;for(let i=0;i<24;i++){v+=(Math.random()-(t==='up'?0.4:0.6))*8;v=Math.max(8,Math.min(92,v));p.push(v)}
-const d=p.map((y,i)=>`${i===0?'M':'L'}${(i/23)*100},${100-y}`).join(' ');
-return `<svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="${d}" fill="none" stroke="${t==='up'?'#00aa44':'#cc2222'}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
-function filterTable(){const q=document.getElementById('searchBox').value.toLowerCase();renderTable(coins.filter(c=>c.name.toLowerCase().includes(q)||c.symbol.toLowerCase().includes(q)))}
 
-// ==================== DETAIL PAGE ====================
-let detailCoin=null, chartPoints=[];
+function mkSpk(t) {
+  var p = []; var v = 50;
+  for (var i = 0; i < 24; i++) { v += (Math.random() - (t === 'up' ? 0.4 : 0.6)) * 8; v = Math.max(8, Math.min(92, v)); p.push(v); }
+  var d = p.map(function(y, i) { return (i === 0 ? 'M' : 'L') + ((i / 23) * 100) + ',' + (100 - y); }).join(' ');
+  return '<svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="' + d + '" fill="none" stroke="' + (t === 'up' ? '#00aa44' : '#cc2222') + '" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+}
 
-function openDetail(id){
-  detailCoin=coins.find(c=>c.name.toLowerCase()===id);
-  if(!detailCoin)return;
+// ==================== SEARCH (DexScreener API) ====================
+var searchTimeout = null;
+
+function filterTable() {
+  var q = document.getElementById('searchBox').value.trim();
+  if (!q) {
+    // Reset to default coin list
+    displayCoins = coins;
+    isShowingSearch = false;
+    renderTable(coins);
+    return;
+  }
+
+  // Local filter first
+  var local = coins.filter(function(c) {
+    return c.name.toLowerCase().includes(q.toLowerCase()) || c.symbol.toLowerCase().includes(q.toLowerCase());
+  });
+  if (local.length > 0 && q.length < 20) {
+    displayCoins = local;
+    isShowingSearch = false;
+    renderTable(local);
+  }
+
+  // Debounced DexScreener search for longer queries or contract addresses
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(function() { dexSearch(q); }, 500);
+}
+
+async function dexSearch(q) {
+  try {
+    var pairs;
+    if (q.length > 30 && !q.includes(' ')) {
+      // Contract address lookup
+      var data = await apiFetch('/tokens/v1/' + encodeURIComponent(q));
+      pairs = Array.isArray(data) ? data : (data.pairs || []);
+    } else {
+      var data = await apiFetch('/latest/dex/search?q=' + encodeURIComponent(q));
+      pairs = data.pairs || [];
+    }
+
+    if (!pairs.length) return;
+
+    // Deduplicate by base token
+    var seen = {};
+    pairs.forEach(function(p) {
+      var addr = ((p.baseToken || {}).address || '').toLowerCase();
+      var liq = ((p.liquidity || {}).usd) || 0;
+      if (!seen[addr] || liq > (((seen[addr].liquidity || {}).usd) || 0)) {
+        seen[addr] = p;
+      }
+    });
+
+    var unique = Object.values(seen)
+      .sort(function(a, b) { return (((b.liquidity || {}).usd) || 0) - (((a.liquidity || {}).usd) || 0); })
+      .slice(0, 15);
+
+    // Map DexScreener results to the coins format for the table
+    var iconColors = ['btc','eth','bnb','sol','xrp','ada','doge','avax','dot','link'];
+    searchResults = unique.map(function(p, i) {
+      var base = p.baseToken || {};
+      var sym = (base.symbol || '???').toUpperCase();
+      var chg = ((p.priceChange || {}).h24) || 0;
+      return {
+        rank: i + 1,
+        name: base.name || sym,
+        symbol: sym,
+        icon: sym.charAt(0),
+        cls: iconColors[i % iconColors.length],
+        price: parseFloat(p.priceUsd) || 0,
+        change: chg,
+        mcap: fmtVol(p.marketCap),
+        fdv: fmtVol(p.fdv),
+        vol: fmtVol(((p.volume || {}).h24) || 0),
+        volH24: ((p.volume || {}).h24) || 0,
+        liq: fmtVol(((p.liquidity || {}).usd) || 0),
+        trend: chg >= 0 ? 'up' : 'down',
+        pair: p
+      };
+    });
+
+    // Only update if search box still has same query
+    if (document.getElementById('searchBox').value.trim() === q) {
+      displayCoins = searchResults;
+      isShowingSearch = true;
+      renderTable(searchResults);
+    }
+  } catch (e) {
+    // Silently fail for search
+  }
+}
+
+// Also search on Enter key
+document.getElementById('searchBox').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    clearTimeout(searchTimeout);
+    var q = this.value.trim();
+    if (q) dexSearch(q);
+  }
+});
+
+// ==================== DETAIL PAGE (DexScreener API) ====================
+var detailCoin = null, chartPoints = [];
+
+async function openDetail(id) {
   document.getElementById('homePage').classList.remove('active');
   document.getElementById('detailPage').classList.add('active');
-  document.getElementById('viewToggle').style.display='none';
+  document.getElementById('viewToggle').style.display = 'none';
 
-  document.getElementById('dName').textContent=detailCoin.name;
-  document.getElementById('dSym').textContent=detailCoin.symbol;
-  document.getElementById('dPrice').textContent='$'+detailCoin.price.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-  document.getElementById('dIcon').className='ci '+detailCoin.cls;
-  document.getElementById('dIcon').textContent=detailCoin.icon;
+  // Check if id is "chainId::pairAddress" format (from API result)
+  if (id.includes('::')) {
+    var parts = id.split('::');
+    var chainId = parts[0];
+    var pairAddress = parts[1];
 
-  const badge=document.getElementById('dBadge');
-  const up=detailCoin.change>=0;
-  badge.className='detail-badge '+(up?'up':'down');
-  badge.textContent=(up?'+':'')+detailCoin.change.toFixed(2)+'%';
+    // Find in current display data first
+    detailCoin = displayCoins.find(function(c) {
+      return c.pair && c.pair.chainId === chainId && c.pair.pairAddress === pairAddress;
+    });
 
-  // Key stats
-  document.getElementById('ksGrid').innerHTML=`
-    <div class="ks-item"><div class="ks-title">RANK</div><div class="ks-value">#${detailCoin.rank}</div></div>
-    <div class="ks-item"><div class="ks-title">MARKET CAP</div><div class="ks-value">${detailCoin.mcap}</div></div>
-    <div class="ks-item"><div class="ks-title">FDV</div><div class="ks-value">${detailCoin.fdv}</div><div class="ks-sub">= Market Cap</div></div>
-    <div class="ks-item"><div class="ks-title">VOLUME 24H</div><div class="ks-value">${detailCoin.vol}</div><div class="ks-sub green">${detailCoin.volChg}</div></div>
-    <div class="ks-item"><div class="ks-title">ATH</div><div class="ks-value">${detailCoin.ath}</div><div class="ks-sub red">${detailCoin.athDiff} below ATH</div></div>
-    <div class="ks-item"><div class="ks-title">CIRCULATING</div><div class="ks-value">${detailCoin.circ}</div><div class="ks-sub">${detailCoin.circPct} of max</div></div>
-  `;
+    // Fetch fresh data from API
+    try {
+      var data = await apiFetch('/latest/dex/pairs/' + chainId + '/' + pairAddress);
+      var pair = (data.pairs || [])[0];
+      if (pair) {
+        var base = pair.baseToken || {};
+        var chg = ((pair.priceChange || {}).h24) || 0;
+        if (!detailCoin) {
+          detailCoin = {
+            name: base.name || base.symbol || '???',
+            symbol: base.symbol || '???',
+            icon: (base.symbol || '?').charAt(0),
+            cls: 'btc',
+            pair: pair
+          };
+        }
+        detailCoin.price = parseFloat(pair.priceUsd) || 0;
+        detailCoin.change = chg;
+        detailCoin.trend = chg >= 0 ? 'up' : 'down';
+        detailCoin.mcap = fmtVol(pair.marketCap);
+        detailCoin.fdv = fmtVol(pair.fdv);
+        detailCoin.vol = fmtVol(((pair.volume || {}).h24) || 0);
+        detailCoin.volH24 = ((pair.volume || {}).h24) || 0;
+        detailCoin.liq = fmtVol(((pair.liquidity || {}).usd) || 0);
+        detailCoin.pair = pair;
+      }
+    } catch (e) { /* use cached data */ }
+  } else {
+    // Legacy: find by name from coins list
+    detailCoin = coins.find(function(c) { return c.name.toLowerCase() === id; });
+  }
+
+  if (!detailCoin) {
+    document.getElementById('dName').textContent = 'Not Found';
+    return;
+  }
+
+  // Populate detail UI
+  document.getElementById('dName').textContent = detailCoin.name;
+  document.getElementById('dSym').textContent = detailCoin.symbol;
+  document.getElementById('dPrice').textContent = fmtPrice(detailCoin.price);
+  document.getElementById('dIcon').className = 'ci ' + detailCoin.cls;
+  document.getElementById('dIcon').textContent = detailCoin.icon;
+
+  var badge = document.getElementById('dBadge');
+  var up = detailCoin.change >= 0;
+  badge.className = 'detail-badge ' + (up ? 'up' : 'down');
+  badge.textContent = (up ? '+' : '') + detailCoin.change.toFixed(2) + '%';
+
+  // Key stats from DexScreener data
+  var pair = detailCoin.pair;
+  var txns = pair ? ((pair.txns || {}).h24 || {}) : {};
+  var buys = txns.buys || 0;
+  var sells = txns.sells || 0;
+  var chg5m = pair ? ((pair.priceChange || {}).m5 || 0) : 0;
+  var chg1h = pair ? ((pair.priceChange || {}).h1 || 0) : 0;
+  var dexName = pair ? (pair.dexId || '--') : '--';
+  var chainName = pair ? (pair.chainId || '--') : '--';
+
+  document.getElementById('ksGrid').innerHTML =
+    '<div class="ks-item"><div class="ks-title">MARKET CAP</div><div class="ks-value">' + detailCoin.mcap + '</div></div>' +
+    '<div class="ks-item"><div class="ks-title">FDV</div><div class="ks-value">' + detailCoin.fdv + '</div></div>' +
+    '<div class="ks-item"><div class="ks-title">VOLUME 24H</div><div class="ks-value">' + detailCoin.vol + '</div></div>' +
+    '<div class="ks-item"><div class="ks-title">LIQUIDITY</div><div class="ks-value">' + detailCoin.liq + '</div></div>' +
+    '<div class="ks-item"><div class="ks-title">BUYS / SELLS</div><div class="ks-value">' + buys.toLocaleString() + ' / ' + sells.toLocaleString() + '</div><div class="ks-sub">24h txns</div></div>' +
+    '<div class="ks-item"><div class="ks-title">CHAIN / DEX</div><div class="ks-value" style="font-size:0.8rem">' + chainName + '</div><div class="ks-sub">' + dexName + '</div></div>';
 
   // Time range buttons
-  document.querySelectorAll('.tr-btn').forEach(b=>{
-    b.onclick=()=>{document.querySelectorAll('.tr-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');drawDetailChart()}
+  document.querySelectorAll('.tr-btn').forEach(function(b) {
+    b.onclick = function() {
+      document.querySelectorAll('.tr-btn').forEach(function(x) { x.classList.remove('active'); });
+      b.classList.add('active');
+      drawDetailChart();
+    };
   });
 
-  setTimeout(()=>drawDetailChart(),80);
+  setTimeout(function() { drawDetailChart(); }, 80);
 }
 
-function drawDetailChart(){
-  const canvas=document.getElementById('dChart');
-  const ctx=canvas.getContext('2d'),dpr=window.devicePixelRatio||1;
-  const wrap=document.getElementById('dChartWrap');
-  const rect=wrap.getBoundingClientRect();
-  canvas.width=rect.width*dpr;canvas.height=rect.height*dpr;
-  ctx.scale(dpr,dpr);
-  const w=rect.width-60,h=rect.height-30;
+function drawDetailChart() {
+  var canvas = document.getElementById('dChart');
+  var ctx = canvas.getContext('2d'), dpr = window.devicePixelRatio || 1;
+  var wrap = document.getElementById('dChartWrap');
+  var rect = wrap.getBoundingClientRect();
+  canvas.width = rect.width * dpr; canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+  var w = rect.width - 60, h = rect.height - 30;
 
-  // Generate data
-  chartPoints=[];let v=h*0.6;
-  const trend=detailCoin?detailCoin.trend:'up';
-  for(let i=0;i<=200;i++){
-    v+=(Math.random()-(trend==='up'?0.43:0.57))*(h*0.04);
-    v=Math.max(h*0.05,Math.min(h*0.92,v));
-    chartPoints.push({x:(i/200)*w,y:v});
+  // Generate simulated data based on real trend direction
+  chartPoints = []; var v = h * 0.6;
+  var trend = detailCoin ? detailCoin.trend : 'up';
+  for (var i = 0; i <= 200; i++) {
+    v += (Math.random() - (trend === 'up' ? 0.43 : 0.57)) * (h * 0.04);
+    v = Math.max(h * 0.05, Math.min(h * 0.92, v));
+    chartPoints.push({x: (i / 200) * w, y: v});
   }
 
   // Grid
-  ctx.strokeStyle='rgba(0,255,136,0.06)';ctx.lineWidth=0.5;
-  for(let i=0;i<=10;i++){const y=(i/10)*h;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
-  for(let i=0;i<=12;i++){const x=(i/12)*w;ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}
+  ctx.strokeStyle = 'rgba(0,255,136,0.06)'; ctx.lineWidth = 0.5;
+  for (var i = 0; i <= 10; i++) { var y = (i / 10) * h; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+  for (var i = 0; i <= 12; i++) { var x = (i / 12) * w; ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
 
-  // Glow effect
-  const glowGrad=ctx.createLinearGradient(0,0,0,h);
-  glowGrad.addColorStop(0,'rgba(0,255,136,0.25)');
-  glowGrad.addColorStop(0.4,'rgba(0,200,120,0.15)');
-  glowGrad.addColorStop(0.7,'rgba(0,180,100,0.06)');
-  glowGrad.addColorStop(1,'rgba(0,150,80,0.01)');
+  // Glow fill
+  var glowGrad = ctx.createLinearGradient(0, 0, 0, h);
+  glowGrad.addColorStop(0, 'rgba(0,255,136,0.25)');
+  glowGrad.addColorStop(0.4, 'rgba(0,200,120,0.15)');
+  glowGrad.addColorStop(0.7, 'rgba(0,180,100,0.06)');
+  glowGrad.addColorStop(1, 'rgba(0,150,80,0.01)');
 
-  ctx.beginPath();ctx.moveTo(chartPoints[0].x,chartPoints[0].y);
-  for(let i=1;i<chartPoints.length;i++){const cx=(chartPoints[i-1].x+chartPoints[i].x)/2;ctx.bezierCurveTo(cx,chartPoints[i-1].y,cx,chartPoints[i].y,chartPoints[i].x,chartPoints[i].y)}
-  ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.closePath();ctx.fillStyle=glowGrad;ctx.fill();
+  ctx.beginPath(); ctx.moveTo(chartPoints[0].x, chartPoints[0].y);
+  for (var i = 1; i < chartPoints.length; i++) { var cx = (chartPoints[i-1].x + chartPoints[i].x) / 2; ctx.bezierCurveTo(cx, chartPoints[i-1].y, cx, chartPoints[i].y, chartPoints[i].x, chartPoints[i].y); }
+  ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath(); ctx.fillStyle = glowGrad; ctx.fill();
 
   // Line with glow
-  ctx.shadowColor='rgba(0,255,136,0.6)';ctx.shadowBlur=8;
-  ctx.beginPath();ctx.moveTo(chartPoints[0].x,chartPoints[0].y);
-  for(let i=1;i<chartPoints.length;i++){const cx=(chartPoints[i-1].x+chartPoints[i].x)/2;ctx.bezierCurveTo(cx,chartPoints[i-1].y,cx,chartPoints[i].y,chartPoints[i].x,chartPoints[i].y)}
-  ctx.strokeStyle='#00ff88';ctx.lineWidth=2;ctx.stroke();
-  ctx.shadowBlur=0;
+  ctx.shadowColor = 'rgba(0,255,136,0.6)'; ctx.shadowBlur = 8;
+  ctx.beginPath(); ctx.moveTo(chartPoints[0].x, chartPoints[0].y);
+  for (var i = 1; i < chartPoints.length; i++) { var cx = (chartPoints[i-1].x + chartPoints[i].x) / 2; ctx.bezierCurveTo(cx, chartPoints[i-1].y, cx, chartPoints[i].y, chartPoints[i].x, chartPoints[i].y); }
+  ctx.strokeStyle = '#00ff88'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.shadowBlur = 0;
 
   // White highlight
-  ctx.beginPath();ctx.moveTo(chartPoints[0].x,chartPoints[0].y-1);
-  for(let i=1;i<chartPoints.length;i++){const cx=(chartPoints[i-1].x+chartPoints[i].x)/2;ctx.bezierCurveTo(cx,chartPoints[i-1].y-1,cx,chartPoints[i].y-1,chartPoints[i].x,chartPoints[i].y-1)}
-  ctx.strokeStyle='rgba(255,255,255,0.25)';ctx.lineWidth=0.8;ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(chartPoints[0].x, chartPoints[0].y - 1);
+  for (var i = 1; i < chartPoints.length; i++) { var cx = (chartPoints[i-1].x + chartPoints[i].x) / 2; ctx.bezierCurveTo(cx, chartPoints[i-1].y - 1, cx, chartPoints[i].y - 1, chartPoints[i].x, chartPoints[i].y - 1); }
+  ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 0.8; ctx.stroke();
 
   // Dotted current price line
-  const lastY=chartPoints[chartPoints.length-1].y;
-  ctx.setLineDash([4,4]);ctx.strokeStyle='rgba(0,255,136,0.3)';ctx.lineWidth=1;
-  ctx.beginPath();ctx.moveTo(0,lastY);ctx.lineTo(w,lastY);ctx.stroke();
+  var lastY = chartPoints[chartPoints.length - 1].y;
+  ctx.setLineDash([4, 4]); ctx.strokeStyle = 'rgba(0,255,136,0.3)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, lastY); ctx.lineTo(w, lastY); ctx.stroke();
   ctx.setLineDash([]);
 
   // Bright dots at peaks
-  for(let i=2;i<chartPoints.length-2;i++){
-    if(chartPoints[i].y<chartPoints[i-1].y&&chartPoints[i].y<chartPoints[i+1].y&&Math.random()>0.7){
-      ctx.beginPath();ctx.arc(chartPoints[i].x,chartPoints[i].y,2,0,Math.PI*2);
-      ctx.fillStyle='rgba(0,255,200,0.7)';ctx.fill();
+  for (var i = 2; i < chartPoints.length - 2; i++) {
+    if (chartPoints[i].y < chartPoints[i-1].y && chartPoints[i].y < chartPoints[i+1].y && Math.random() > 0.7) {
+      ctx.beginPath(); ctx.arc(chartPoints[i].x, chartPoints[i].y, 2, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(0,255,200,0.7)'; ctx.fill();
     }
   }
 
-  // Price axis
-  const minY=Math.min(...chartPoints.map(p=>p.y));
-  const maxY=Math.max(...chartPoints.map(p=>p.y));
-  const pBase=detailCoin?detailCoin.price:66500;
-  const pRange=pBase*0.08;
-  const axis=document.getElementById('priceAxis');
-  let ticks='';
-  for(let i=0;i<=8;i++){
-    const pv=pBase+pRange*(1-i/4);
-    ticks+=`<div class="price-tick">${pv>=1000?'$'+(pv/1000).toFixed(1)+'K':'$'+pv.toFixed(2)}</div>`;
+  // Price axis using real price
+  var pBase = detailCoin ? detailCoin.price : 1;
+  var pRange = pBase * 0.08;
+  var axis = document.getElementById('priceAxis');
+  var ticks = '';
+  for (var i = 0; i <= 8; i++) {
+    var pv = pBase + pRange * (1 - i / 4);
+    if (pv >= 1000) ticks += '<div class="price-tick">$' + (pv / 1000).toFixed(1) + 'K</div>';
+    else if (pv >= 1) ticks += '<div class="price-tick">$' + pv.toFixed(2) + '</div>';
+    else ticks += '<div class="price-tick">$' + pv.toFixed(4) + '</div>';
   }
-  axis.innerHTML=ticks;
+  axis.innerHTML = ticks;
 
   // Current price label position
-  const pnow=document.getElementById('priceNow');
-  const pct=(lastY-0)/(h);
-  pnow.style.top=Math.min(Math.max(pct*100,5),90)+'%';
-  const pDisp=detailCoin?detailCoin.price:66600;
-  pnow.textContent=pDisp>=1000?'$'+(pDisp/1000).toFixed(1)+'K':'$'+pDisp.toFixed(2);
+  var pnow = document.getElementById('priceNow');
+  var pct = lastY / h;
+  pnow.style.top = Math.min(Math.max(pct * 100, 5), 90) + '%';
+  if (pBase >= 1000) pnow.textContent = '$' + (pBase / 1000).toFixed(1) + 'K';
+  else if (pBase >= 1) pnow.textContent = '$' + pBase.toFixed(2);
+  else pnow.textContent = '$' + pBase.toFixed(4);
 
   // Time axis
-  const times=['18:31','21:00','23:55','03:01','06:00','09:00','12:01','18:01'];
-  document.getElementById('timeAxis').innerHTML=times.map(t=>`<span class="time-tick">${t}</span>`).join('');
+  var times = ['18:31','21:00','23:55','03:01','06:00','09:00','12:01','18:01'];
+  document.getElementById('timeAxis').innerHTML = times.map(function(t) { return '<span class="time-tick">' + t + '</span>'; }).join('');
 }
 
 // Crosshair on hover
-document.getElementById('dChartWrap').addEventListener('mousemove',e=>{
-  const wrap=document.getElementById('dChartWrap');
-  const rect=wrap.getBoundingClientRect();
-  const x=e.clientX-rect.left;
-  const cv=document.getElementById('crossV');
-  cv.style.display='block';cv.style.left=x+'px';
-  const pct=x/rect.width;
-  const hours=Math.floor(pct*24);const mins=Math.floor((pct*24-hours)*60);
-  document.getElementById('crossLabel').textContent=`${String(hours).padStart(2,'0')}:${String(mins).padStart(2,'0')}`;
+document.getElementById('dChartWrap').addEventListener('mousemove', function(e) {
+  var wrap = document.getElementById('dChartWrap');
+  var rect = wrap.getBoundingClientRect();
+  var x = e.clientX - rect.left;
+  var cv = document.getElementById('crossV');
+  cv.style.display = 'block'; cv.style.left = x + 'px';
+  var pct = x / rect.width;
+  var hours = Math.floor(pct * 24); var mins = Math.floor((pct * 24 - hours) * 60);
+  document.getElementById('crossLabel').textContent = String(hours).padStart(2, '0') + ':' + String(mins).padStart(2, '0');
 });
-document.getElementById('dChartWrap').addEventListener('mouseleave',()=>{
-  document.getElementById('crossV').style.display='none';
+document.getElementById('dChartWrap').addEventListener('mouseleave', function() {
+  document.getElementById('crossV').style.display = 'none';
 });
 
 // ==================== INIT ====================
-buildSide();renderTable(coins);drawHomeChart();
-window.addEventListener('resize',()=>{
-  if(document.getElementById('homePage').classList.contains('active'))drawHomeChart();
-  else if(detailCoin)drawDetailChart();
+renderTable(coins); // Show skeleton immediately
+buildSide();
+drawHomeChart();
+fetchAllPrices(); // Then fetch live data from DexScreener
+
+window.addEventListener('resize', function() {
+  if (document.getElementById('homePage').classList.contains('active')) drawHomeChart();
+  else if (detailCoin) drawDetailChart();
 });
 </script>
 </body>
