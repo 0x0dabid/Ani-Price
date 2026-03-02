@@ -92,7 +92,8 @@ body { font-family:'Nunito',sans-serif; background:var(--bg); color:var(--text-d
 .watchlist-right.hidden { width:0; border-left-width:0; opacity:0; pointer-events:none; }
 
 .coin-head { display:flex; align-items:center; gap:10px; margin-bottom:2px; }
-.ci { width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1rem;color:#fff;flex-shrink:0; }
+.ci { width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1rem;color:#fff;flex-shrink:0;overflow:hidden; }
+.ci img { width:100%;height:100%;border-radius:50%;object-fit:cover; }
 .ci.btc{background:linear-gradient(135deg,#f7931a,#e8860a)}.ci.eth{background:linear-gradient(135deg,#627eea,#4a6bd6)}.ci.bnb{background:linear-gradient(135deg,#f3ba2f,#e0a800)}.ci.sol{background:linear-gradient(135deg,#9945ff,#14f195)}.ci.xrp{background:linear-gradient(135deg,#2a2a2a,#555)}.ci.ada{background:linear-gradient(135deg,#0033ad,#0055ff)}.ci.doge{background:linear-gradient(135deg,#c2a633,#ba9f33)}.ci.avax{background:linear-gradient(135deg,#e84142,#c0292a)}.ci.dot{background:linear-gradient(135deg,#e6007a,#cc006b)}.ci.link{background:linear-gradient(135deg,#2a5ada,#1e4ac0)}
 .coin-head h2 { font-size:1.4rem; font-weight:800; }
 .wprice {
@@ -434,6 +435,26 @@ async function apiFetch(path) {
   return resp.json();
 }
 
+// Helper: render a coin icon as <img> if logoUrl available, else text fallback
+function coinIcon(c, extraClasses) {
+  var cls = 'ci ' + (c.cls || '');
+  if (extraClasses) cls += ' ' + extraClasses;
+  if (c.logoUrl) {
+    return '<div class="' + cls + '"><img src="' + c.logoUrl.replace(/"/g, '&quot;') + '" alt="' + (c.symbol || '') + '"></div>';
+  }
+  return '<div class="' + cls + '">' + (c.icon || (c.symbol || '?').charAt(0)) + '</div>';
+}
+
+// Helper: set an existing icon element's content (for watchlist header / detail page)
+function setIconContent(el, c) {
+  el.className = 'ci ' + (c.cls || '');
+  if (c.logoUrl) {
+    el.innerHTML = '<img src="' + c.logoUrl + '" alt="' + (c.symbol || '') + '">';
+  } else {
+    el.textContent = c.icon || (c.symbol || '?').charAt(0);
+  }
+}
+
 function fmtVol(v) {
   if (v == null) return 'N/A';
   if (v >= 1e12) return '$' + (v/1e12).toFixed(2) + 'T';
@@ -503,6 +524,7 @@ async function fetchAllPrices() {
           coin.volH24 = ((best.volume || {}).h24) || 0;
           coin.liq = fmtVol(((best.liquidity || {}).usd) || 0);
           coin.pair = best;
+          coin.logoUrl = ((best.info || {}).imageUrl) || null;
         }
       })
       .catch(function() { /* skip failed fetches */ });
@@ -556,7 +578,7 @@ function buildSide() {
       : fmtPrice(c.price);
     return '<div class="sr ' + (c.name.toLowerCase() === currentWatch ? 'act' : '') + '" onclick="setWatch(\'' + c.name.toLowerCase() + '\')">' +
       '<div class="sr-left">' +
-        '<div class="sr-icon ci ' + c.cls + '">' + c.icon + '</div>' +
+        coinIcon(c, 'sr-icon') +
         '<div class="sr-info"><span class="sr-sym">' + c.symbol + '</span><span class="sr-mc">' + c.mcap + '</span></div>' +
       '</div>' +
       '<div class="sr-price ' + cols[i] + '">' + priceStr + '</div>' +
@@ -573,8 +595,7 @@ function setWatch(id) {
   var el = document.getElementById('wChange'), up = c.change >= 0;
   el.className = 'wchange ' + (up ? 'up' : 'down');
   el.innerHTML = (up ? '▲' : '▼') + ' ' + Math.abs(c.change).toFixed(2) + '% <span class="per">(24h)</span>';
-  document.getElementById('wIcon').className = 'ci ' + c.cls;
-  document.getElementById('wIcon').textContent = c.icon;
+  setIconContent(document.getElementById('wIcon'), c);
   buildSide();
   drawHomeChart();
 }
@@ -605,7 +626,7 @@ function renderTable(data) {
     var priceStr = c.price ? fmtPrice(c.price) : '--';
     return '<tr onclick="openDetail(\'' + id.replace(/'/g, "\\'") + '\')">' +
       '<td><span class="rn">' + c.rank + '</span><span class="ea">◆</span></td>' +
-      '<td><div class="cnc"><div class="ci ' + c.cls + '">' + c.icon + '</div><span class="cnt">' + c.name + '</span></div></td>' +
+      '<td><div class="cnc">' + coinIcon(c) + '<span class="cnt">' + c.name + '</span></div></td>' +
       '<td style="font-weight:800">' + priceStr + '</td>' +
       '<td><div class="chc ' + (c.change >= 0 ? 'up' : 'down') + '">' + (c.change >= 0 ? '▲' : '▼') + ' ' + Math.abs(c.change).toFixed(2) + '%</div></td>' +
       '<td class="mc">' + c.mcap + '</td>' +
@@ -688,6 +709,7 @@ async function dexSearch(q) {
         name: base.name || sym,
         symbol: sym,
         icon: sym.charAt(0),
+        logoUrl: ((p.info || {}).imageUrl) || null,
         cls: iconColors[i % iconColors.length],
         price: parseFloat(p.priceUsd) || 0,
         change: chg,
@@ -753,6 +775,7 @@ async function openDetail(id) {
             symbol: base.symbol || '???',
             icon: (base.symbol || '?').charAt(0),
             cls: 'btc',
+            logoUrl: ((pair.info || {}).imageUrl) || null,
             pair: pair
           };
         }
@@ -764,6 +787,7 @@ async function openDetail(id) {
         detailCoin.vol = fmtVol(((pair.volume || {}).h24) || 0);
         detailCoin.volH24 = ((pair.volume || {}).h24) || 0;
         detailCoin.liq = fmtVol(((pair.liquidity || {}).usd) || 0);
+        detailCoin.logoUrl = ((pair.info || {}).imageUrl) || detailCoin.logoUrl || null;
         detailCoin.pair = pair;
       }
     } catch (e) { /* use cached data */ }
@@ -781,8 +805,7 @@ async function openDetail(id) {
   document.getElementById('dName').textContent = detailCoin.name;
   document.getElementById('dSym').textContent = detailCoin.symbol;
   document.getElementById('dPrice').textContent = fmtPrice(detailCoin.price);
-  document.getElementById('dIcon').className = 'ci ' + detailCoin.cls;
-  document.getElementById('dIcon').textContent = detailCoin.icon;
+  setIconContent(document.getElementById('dIcon'), detailCoin);
 
   var badge = document.getElementById('dBadge');
   var up = detailCoin.change >= 0;
