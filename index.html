@@ -1464,12 +1464,12 @@ async function nnFetchFlows() {
     if (!row) { st.textContent = 'No flow data found.'; return; }
 
     var segments = [
-      { label: 'EXCHANGES', key: 'exchange', icon: '🏦' },
-      { label: 'SMART TRADERS', key: 'smart_trader', icon: '🧠' },
-      { label: 'WHALES', key: 'whale', icon: '🐋' },
-      { label: 'TOP PnL', key: 'top_pnl', icon: '📈' },
-      { label: 'PUBLIC FIGURES', key: 'public_figure', icon: '👤' },
-      { label: 'FRESH WALLETS', key: 'fresh_wallets', icon: '🆕' }
+      { label: 'EXCHANGES', key: 'exchange', icon: '&#127974;' },
+      { label: 'SMART TRADERS', key: 'smart_trader', icon: '&#129504;' },
+      { label: 'WHALES', key: 'whale', icon: '&#128011;' },
+      { label: 'TOP PnL', key: 'top_pnl', icon: '&#128200;' },
+      { label: 'PUBLIC FIGURES', key: 'public_figure', icon: '&#128100;' },
+      { label: 'FRESH WALLETS', key: 'fresh_wallets', icon: '&#9889;' }
     ];
 
     var html = '<div class="flow-grid">';
@@ -1485,7 +1485,6 @@ async function nnFetchFlows() {
     });
     html += '</div>';
 
-    // Summary bar
     var exNf = row.exchange_net_flow_usd || 0;
     var smNf = row.smart_trader_net_flow_usd || 0;
     var whNf = row.whale_net_flow_usd || 0;
@@ -1507,7 +1506,6 @@ async function nnFetchSignals() {
   st.textContent = 'Generating signals from onchain data...'; st.style.display = '';
   document.getElementById('nnSigContent').style.display = 'none';
   try {
-    // Fetch both holdings and netflows to generate signals
     var chains = nnChains();
     var holdP = nnPost('/smart-money/holdings', {
       chains: chains, pagination: { page: 1, per_page: 10 },
@@ -1532,9 +1530,9 @@ async function nnFetchSignals() {
 
     var html = '';
 
-    // Accumulating section
+    // Bullish signals
     html += '<div style="margin-bottom:18px">' +
-      '<div style="font-weight:900;font-size:0.9rem;color:var(--green);margin-bottom:8px">BULLISH SIGNALS — Smart Money Accumulating</div>' +
+      '<div style="font-weight:900;font-size:0.9rem;color:var(--green);margin-bottom:8px">BULLISH SIGNALS &mdash; Smart Money Accumulating</div>' +
       '<div style="font-size:0.72rem;color:#999;margin-bottom:10px">Tokens with strongest SM inflows and rising holdings in the last 24h</div>';
     inflows.forEach(function(t) {
       var nf = t.net_flow_24h_usd || 0;
@@ -1551,9 +1549,9 @@ async function nnFetchSignals() {
     });
     html += '</div>';
 
-    // Distribution section
+    // Bearish signals
     html += '<div style="margin-bottom:18px">' +
-      '<div style="font-weight:900;font-size:0.9rem;color:var(--red);margin-bottom:8px">BEARISH SIGNALS — Smart Money Distributing</div>' +
+      '<div style="font-weight:900;font-size:0.9rem;color:var(--red);margin-bottom:8px">BEARISH SIGNALS &mdash; Smart Money Distributing</div>' +
       '<div style="font-size:0.72rem;color:#999;margin-bottom:10px">Tokens with strongest SM outflows in the last 24h</div>';
     outflows.forEach(function(t) {
       var nf = t.net_flow_24h_usd || 0;
@@ -1569,9 +1567,9 @@ async function nnFetchSignals() {
     });
     html += '</div>';
 
-    // Top Holdings section
+    // Top holdings
     html += '<div>' +
-      '<div style="font-weight:900;font-size:0.9rem;color:var(--accent-blue);margin-bottom:8px">TOP SM HOLDINGS — Highest Conviction Positions</div>' +
+      '<div style="font-weight:900;font-size:0.9rem;color:var(--accent-blue);margin-bottom:8px">TOP SM HOLDINGS &mdash; Highest Conviction Positions</div>' +
       '<div style="font-size:0.72rem;color:#999;margin-bottom:10px">Tokens with largest SM holding value, sorted by 24h balance increase</div>';
     holdings.forEach(function(t) {
       var chg = t.balance_24h_percent_change;
