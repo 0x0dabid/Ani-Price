@@ -358,6 +358,74 @@ table.nt { width:100%;border-collapse:collapse; }
 @keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 .anim{animation:slideUp 0.4s ease-out}
 
+/* ===== SLIDING SIDEBAR ===== */
+.sb-overlay {
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.55);z-index:900;
+  opacity:0;pointer-events:none;transition:opacity 0.3s;
+}
+.sb-overlay.open { opacity:1;pointer-events:auto; }
+.sb-panel {
+  position:fixed;top:0;left:0;bottom:0;width:300px;
+  background:linear-gradient(180deg,#13132a 0%,#1a1a3a 40%,#0d1f2d 100%);
+  z-index:910;transform:translateX(-100%);transition:transform 0.35s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;overflow-y:auto;
+  box-shadow:4px 0 24px rgba(0,0,0,0.5);
+}
+.sb-overlay.open + .sb-panel, .sb-panel.open { transform:translateX(0); }
+.sb-head {
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 20px 14px;border-bottom:1px solid rgba(255,255,255,0.08);
+}
+.sb-brand {
+  font-family:'Fredoka One',cursive;font-size:1.3rem;
+  background:linear-gradient(180deg,#ff6644,#ff3388);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.sb-close {
+  width:32px;height:32px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);
+  background:transparent;color:#aaa;font-size:1.2rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all 0.15s;
+}
+.sb-close:hover { background:rgba(255,255,255,0.1);color:#fff; }
+.sb-section { padding:14px 0; border-bottom:1px solid rgba(255,255,255,0.06); }
+.sb-section:last-child { border-bottom:none; }
+.sb-label {
+  padding:0 20px 8px;font-size:0.65rem;font-weight:800;
+  letter-spacing:1.5px;color:rgba(255,255,255,0.35);text-transform:uppercase;
+}
+.sb-item {
+  display:flex;align-items:center;gap:12px;
+  padding:10px 20px;cursor:pointer;transition:background 0.15s;
+  color:rgba(255,255,255,0.75);font-weight:700;font-size:0.88rem;
+  text-decoration:none;
+}
+.sb-item:hover { background:rgba(255,255,255,0.06);color:#fff; }
+.sb-item.active { background:rgba(0,255,136,0.08);color:#00ff88; }
+.sb-icon {
+  width:32px;height:32px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;flex-shrink:0;
+  background:rgba(255,255,255,0.06);
+}
+.sb-item.active .sb-icon { background:rgba(0,255,136,0.15); }
+.sb-key-input {
+  margin:0 20px;padding:8px 12px;border-radius:6px;
+  border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);
+  color:#ccc;font-size:0.78rem;font-family:'Nunito',sans-serif;font-weight:600;
+  width:calc(100% - 40px);outline:none;
+}
+.sb-key-input:focus { border-color:#00ff88;background:rgba(0,255,136,0.05); }
+.sb-key-label { padding:0 20px 6px;font-size:0.7rem;font-weight:700;color:rgba(255,255,255,0.4); }
+.sb-footer {
+  margin-top:auto;padding:16px 20px;
+  border-top:1px solid rgba(255,255,255,0.06);
+  font-size:0.68rem;color:rgba(255,255,255,0.25);font-weight:700;
+}
+@media(max-width:480px){
+  .sb-panel{width:85vw}
+}
+
 @media(max-width:768px){
   .header{flex-wrap:wrap;padding:8px 10px}
   .watchlist-body{flex-direction:column}
@@ -373,10 +441,67 @@ table.nt { width:100%;border-collapse:collapse; }
 </head>
 <body>
 
+<!-- ===== SLIDING SIDEBAR ===== -->
+<div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
+<div class="sb-panel" id="sbPanel">
+  <div class="sb-head">
+    <span class="sb-brand">Ani-price</span>
+    <button class="sb-close" onclick="closeSidebar()">&times;</button>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-label">Navigation</div>
+    <div class="sb-item active" onclick="sbNav('home')">
+      <div class="sb-icon">&#127968;</div> Prices Dashboard
+    </div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-label">Nansen API Key</div>
+    <input type="text" class="sb-key-input" id="sbNansenKey" placeholder="Enter your Nansen API key">
+    <div class="sb-key-label">Required for onchain features below</div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-label">Onchain Intelligence</div>
+    <div class="sb-item" onclick="sbNav('screener')">
+      <div class="sb-icon">&#128270;</div> Token Screener
+    </div>
+    <div class="sb-item" onclick="sbNav('holdings')">
+      <div class="sb-icon">&#128176;</div> SM Holdings
+    </div>
+    <div class="sb-item" onclick="sbNav('netflows')">
+      <div class="sb-icon">&#128200;</div> SM Netflows
+    </div>
+    <div class="sb-item" onclick="sbNav('flows')">
+      <div class="sb-icon">&#128161;</div> Flow Intelligence
+    </div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-label">Investment Intelligence</div>
+    <div class="sb-item" onclick="sbNav('signals')">
+      <div class="sb-icon">&#9889;</div> Buy / Sell Signals
+    </div>
+    <div class="sb-item" onclick="sbNav('leaderboard')">
+      <div class="sb-icon">&#127942;</div> PnL Leaderboard
+    </div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-label">Wallet Analysis</div>
+    <div class="sb-item" onclick="sbNav('wallet')">
+      <div class="sb-icon">&#128091;</div> Wallet Deep Dive
+    </div>
+  </div>
+
+  <div class="sb-footer">Powered by Nansen API &bull; Ani-Price &copy; 2026</div>
+</div>
+
 <!-- HEADER -->
 <div class="header">
   <div class="header-left" style="display:flex;align-items:center;gap:14px">
-    <div class="logo" onclick="goHome()">Ani-price</div>
+    <div class="logo" onclick="toggleSidebar()">&#9776; Ani-price</div>
     <div class="mcap-info">mcap: <span class="val">$2.36T</span> <span class="chg">▲ 3.5%</span></div>
   </div>
   <div class="header-right">
@@ -1731,6 +1856,61 @@ async function nnFetchWallet() {
   document.getElementById('nansenKey').addEventListener('change', function() {
     localStorage.setItem('nansen_api_key', this.value.trim());
   });
+})();
+
+// ==================== SIDEBAR ====================
+function toggleSidebar() {
+  var overlay = document.getElementById('sbOverlay');
+  var panel = document.getElementById('sbPanel');
+  var isOpen = overlay.classList.contains('open');
+  if (isOpen) { closeSidebar(); } else { openSidebar(); }
+}
+function openSidebar() {
+  document.getElementById('sbOverlay').classList.add('open');
+  document.getElementById('sbPanel').classList.add('open');
+  // Sync API key from main input to sidebar input
+  var mainKey = document.getElementById('nansenKey').value;
+  if (mainKey) document.getElementById('sbNansenKey').value = mainKey;
+}
+function closeSidebar() {
+  document.getElementById('sbOverlay').classList.remove('open');
+  document.getElementById('sbPanel').classList.remove('open');
+}
+function sbNav(section) {
+  // Sync API key from sidebar input to main input
+  var sbKey = document.getElementById('sbNansenKey').value.trim();
+  if (sbKey) {
+    document.getElementById('nansenKey').value = sbKey;
+    localStorage.setItem('nansen_api_key', sbKey);
+  }
+  // Update active state in sidebar
+  document.querySelectorAll('.sb-item').forEach(function(el) { el.classList.remove('active'); });
+  event.currentTarget.classList.add('active');
+  closeSidebar();
+
+  if (section === 'home') {
+    goHome();
+    return;
+  }
+  // Navigate to Nansen section and activate the tab
+  goHome();
+  setTimeout(function() {
+    nnTab(section);
+    document.getElementById('nansenSection').scrollIntoView({behavior:'smooth'});
+  }, 100);
+}
+
+// Sync sidebar key input to main input on change
+document.getElementById('sbNansenKey').addEventListener('change', function() {
+  var v = this.value.trim();
+  document.getElementById('nansenKey').value = v;
+  localStorage.setItem('nansen_api_key', v);
+});
+
+// Load saved key into sidebar too
+(function() {
+  var saved = localStorage.getItem('nansen_api_key');
+  if (saved) document.getElementById('sbNansenKey').value = saved;
 })();
 
 // ==================== INIT ====================
