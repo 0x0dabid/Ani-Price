@@ -160,19 +160,10 @@ class PriceTracker:
                 })
         return results
 
-    # ── Nansen Screener ─────────────────────────────────────────────
+    # ── Nansen: Token Screener ───────────────────────────────────────
 
     def screener(self, api_key, chains, **kwargs):
-        """Run the Nansen Token Screener and return results.
-
-        Args:
-            api_key: Nansen API key.
-            chains: List of chain names.
-            **kwargs: Forwarded to NansenClient.token_screener().
-
-        Returns:
-            Dict with "tokens" list and "pagination" info.
-        """
+        """Run the Nansen Token Screener and return results."""
         client = NansenClient(api_key)
         result = client.token_screener(chains, **kwargs)
         data = result.get("data") or []
@@ -180,9 +171,66 @@ class PriceTracker:
         tokens = [self._summarize_screener_token(t) for t in data]
         return {"tokens": tokens, "pagination": pagination}
 
+    # ── Nansen: Smart Money ────────────────────────────────────────
+
+    def sm_holdings(self, api_key, chains, **kwargs):
+        """Smart Money holdings."""
+        client = NansenClient(api_key)
+        return client.smart_money_holdings(chains, **kwargs)
+
+    def sm_netflows(self, api_key, chains, **kwargs):
+        """Smart Money net flows."""
+        client = NansenClient(api_key)
+        return client.smart_money_netflows(chains, **kwargs)
+
+    def sm_dex_trades(self, api_key, chains, **kwargs):
+        """Smart Money DEX trades."""
+        client = NansenClient(api_key)
+        return client.smart_money_dex_trades(chains, **kwargs)
+
+    # ── Nansen: Token God Mode ─────────────────────────────────────
+
+    def flow_intelligence(self, api_key, chain, token_address, **kwargs):
+        """Flow Intelligence for a token."""
+        client = NansenClient(api_key)
+        return client.flow_intelligence(chain, token_address, **kwargs)
+
+    def pnl_leaderboard(self, api_key, chain, token_address, **kwargs):
+        """PnL Leaderboard for a token."""
+        client = NansenClient(api_key)
+        return client.pnl_leaderboard(chain, token_address, **kwargs)
+
+    # ── Nansen: Wallet Profiler ────────────────────────────────────
+
+    def wallet_balances(self, api_key, addresses, chain="all"):
+        """Wallet current balances (FREE)."""
+        client = NansenClient(api_key)
+        return client.address_balances(addresses, chain)
+
+    def wallet_pnl(self, api_key, address, **kwargs):
+        """Wallet PnL per token."""
+        client = NansenClient(api_key)
+        return client.address_pnl(address, **kwargs)
+
+    def wallet_pnl_summary(self, api_key, address, **kwargs):
+        """Wallet aggregate PnL."""
+        client = NansenClient(api_key)
+        return client.address_pnl_summary(address, **kwargs)
+
+    def wallet_counterparties(self, api_key, addresses, **kwargs):
+        """Top counterparties for a wallet."""
+        client = NansenClient(api_key)
+        return client.address_counterparties(addresses, **kwargs)
+
+    def wallet_related(self, api_key, address, **kwargs):
+        """Related wallets (funding/deployment links)."""
+        client = NansenClient(api_key)
+        return client.address_related_wallets(address, **kwargs)
+
+    # ── Nansen formatters (static) ─────────────────────────────────
+
     @staticmethod
     def _summarize_screener_token(token):
-        """Normalize a Nansen screener token into a summary dict."""
         return {
             "chain": token.get("chain", ""),
             "address": token.get("token_address", ""),
@@ -204,7 +252,6 @@ class PriceTracker:
 
     @staticmethod
     def format_screener_line(info):
-        """Format a screener token as a one-line table row string."""
         symbol = info.get("symbol", "???")
         chain = info.get("chain", "")
         price_str = format_usd(info["priceUsd"]) if info.get("priceUsd") is not None else "N/A"
@@ -213,42 +260,7 @@ class PriceTracker:
         vol = format_volume(info.get("volume"))
         liq = format_volume(info.get("liquidityUsd"))
         age = f"{info['tokenAgeDays']}d" if info.get("tokenAgeDays") is not None else "N/A"
-
         return f"  {symbol:<10} {chain:<10} {price_str:>14} {change:>9} {mcap:>10} {vol:>10} {liq:>10} {age:>6}"
-
-    @staticmethod
-    def format_screener_detail(info):
-        """Format detailed screener token info as a multi-line string."""
-        lines = []
-        lines.append(f"  {info.get('symbol', '???')} on {info.get('chain', 'unknown')}")
-        lines.append(f"  Address: {info.get('address', 'N/A')}")
-        lines.append(f"  Token Age: {info.get('tokenAgeDays', 'N/A')} days")
-        lines.append("")
-
-        price_str = format_usd(info["priceUsd"]) if info.get("priceUsd") is not None else "N/A"
-        lines.append(f"  Price (USD):  {price_str}")
-        lines.append(f"  Price Change: {format_pct(info.get('priceChange'))}")
-        lines.append("")
-
-        lines.append(f"  Market Cap:   {format_volume(info.get('marketCap'))}")
-        lines.append(f"  FDV:          {format_volume(info.get('fdv'))}")
-        if info.get("fdvMcRatio") is not None:
-            lines.append(f"  FDV/MC Ratio: {info['fdvMcRatio']:.2f}x")
-        lines.append(f"  Liquidity:    {format_volume(info.get('liquidityUsd'))}")
-        lines.append("")
-
-        lines.append("  Volume:")
-        lines.append(f"    Total: {format_volume(info.get('volume'))}")
-        lines.append(f"    Buy:   {format_volume(info.get('buyVolume'))}")
-        lines.append(f"    Sell:  {format_volume(info.get('sellVolume'))}")
-        lines.append(f"    Net:   {format_volume(info.get('netflow'))}")
-
-        if info.get("inflowFdvRatio") is not None:
-            lines.append(f"  Inflow/FDV:   {info['inflowFdvRatio']:.4f}")
-        if info.get("outflowFdvRatio") is not None:
-            lines.append(f"  Outflow/FDV:  {info['outflowFdvRatio']:.4f}")
-
-        return "\n".join(lines)
 
     # ── Formatting ─────────────────────────────────────────────────
 

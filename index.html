@@ -147,73 +147,65 @@ table.ct{width:100%;border-collapse:collapse}
 .mc{font-weight:700;color:#666}
 .slc{width:90px;height:28px}.slc svg{width:100%;height:100%}
 
-/* ===== NANSEN SCREENER ===== */
-.nansen-sec {
-  margin:16px 20px; border:3px solid var(--border); border-radius:8px;
-  background:var(--card-bg); overflow:hidden;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5), 0 3px 10px rgba(50,50,150,0.1);
-}
-.nansen-header {
-  display:flex;align-items:center;justify-content:space-between;padding:8px 14px;
-  border-bottom:2px solid var(--border);
-  background:linear-gradient(90deg,#1a1a3a,#2a2a5a);
-}
-.nansen-title { font-weight:900;font-size:0.85rem;color:#00ff88;letter-spacing:1px; }
-.nansen-badge { font-size:0.65rem;font-weight:800;color:#aaf;background:rgba(255,255,255,0.1);padding:3px 10px;border-radius:12px; }
-.nansen-controls {
-  display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px;
-  border-bottom:1px solid #eee;background:#fafafe;align-items:center;
-}
-.nansen-controls label { font-size:0.75rem;font-weight:800;color:#666; }
-.nansen-controls select,.nansen-controls input[type="text"],.nansen-controls input[type="number"] {
-  padding:5px 10px;border:2px solid #ccc;border-radius:6px;font-size:0.78rem;
-  font-family:'Nunito',sans-serif;font-weight:600;outline:none;
-}
-.nansen-controls select:focus,.nansen-controls input:focus { border-color:var(--accent-blue); }
-.nansen-go {
-  padding:6px 20px;background:linear-gradient(180deg,#00cc55,#009944);color:#fff;
-  border:2px solid #007733;border-radius:6px;font-weight:900;font-size:0.8rem;
-  cursor:pointer;font-family:'Nunito',sans-serif;transition:transform 0.1s;
-}
-.nansen-go:hover { transform:translateY(-1px); }
-.nansen-go:disabled { opacity:0.5;cursor:not-allowed;transform:none; }
-.nansen-toggle {
-  padding:5px 14px;background:transparent;border:2px solid var(--border-light);border-radius:6px;
-  font-weight:800;font-size:0.75rem;cursor:pointer;font-family:'Nunito',sans-serif;color:#888;
-}
-.nansen-toggle.active { background:#1a1a3a;color:#00ff88;border-color:#00ff88; }
-.nansen-status { padding:12px 14px;text-align:center;font-weight:700;font-size:0.85rem;color:#999; }
-.nansen-pagination { display:flex;align-items:center;justify-content:center;gap:10px;padding:10px;border-top:1px solid #eee; }
-.nansen-pgbtn {
-  padding:5px 14px;border:2px solid var(--border-light);border-radius:6px;
-  background:#fff;font-weight:800;font-size:0.78rem;cursor:pointer;font-family:'Nunito',sans-serif;
-}
-.nansen-pgbtn:hover { background:#f0f0ff; }
-.nansen-pgbtn:disabled { opacity:0.4;cursor:not-allowed; }
-.nansen-pginfo { font-size:0.8rem;font-weight:700;color:#666; }
+/* ===== NANSEN DASHBOARD ===== */
+.nn { margin:16px 20px;border:3px solid var(--border);border-radius:8px;background:var(--card-bg);overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.5),0 3px 10px rgba(50,50,150,0.1); }
+.nn-hdr { display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:2px solid var(--border);background:linear-gradient(90deg,#1a1a3a,#2a2a5a); }
+.nn-title { font-weight:900;font-size:0.85rem;color:#00ff88;letter-spacing:1px; }
+.nn-badge { font-size:0.65rem;font-weight:800;color:#aaf;background:rgba(255,255,255,0.1);padding:3px 10px;border-radius:12px; }
+.nn-key-row { display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid #eee;background:#fafafe; }
+.nn-key-row label { font-size:0.75rem;font-weight:800;color:#666; }
+.nn-key-row input { padding:5px 10px;border:2px solid #ccc;border-radius:6px;font-size:0.78rem;font-family:'Nunito',sans-serif;font-weight:600;outline:none;width:260px; }
+.nn-key-row input:focus { border-color:var(--accent-blue); }
+.nn-tabs { display:flex;border-bottom:2px solid #e0e0f0;background:#f6f6ff;overflow-x:auto; }
+.nn-tab { padding:10px 18px;font-weight:800;font-size:0.8rem;cursor:pointer;color:#888;border-bottom:3px solid transparent;white-space:nowrap;font-family:'Nunito',sans-serif;transition:all 0.15s;background:transparent;border-top:none;border-left:none;border-right:none; }
+.nn-tab:hover { color:#555;background:#f0f0ff; }
+.nn-tab.active { color:#1a1a3a;border-bottom-color:var(--accent-blue); }
+.nn-panel { display:none;padding:0; }
+.nn-panel.active { display:block; }
+.nn-ctrl { display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px;border-bottom:1px solid #eee;background:#fafafe;align-items:center; }
+.nn-ctrl label { font-size:0.75rem;font-weight:800;color:#666; }
+.nn-ctrl select,.nn-ctrl input[type="text"],.nn-ctrl input[type="number"] { padding:5px 10px;border:2px solid #ccc;border-radius:6px;font-size:0.78rem;font-family:'Nunito',sans-serif;font-weight:600;outline:none; }
+.nn-ctrl select:focus,.nn-ctrl input:focus { border-color:var(--accent-blue); }
+.nn-btn { padding:6px 20px;background:linear-gradient(180deg,#00cc55,#009944);color:#fff;border:2px solid #007733;border-radius:6px;font-weight:900;font-size:0.8rem;cursor:pointer;font-family:'Nunito',sans-serif;transition:transform 0.1s; }
+.nn-btn:hover { transform:translateY(-1px); }
+.nn-btn:disabled { opacity:0.5;cursor:not-allowed;transform:none; }
+.nn-toggle { padding:5px 14px;background:transparent;border:2px solid var(--border-light);border-radius:6px;font-weight:800;font-size:0.75rem;cursor:pointer;font-family:'Nunito',sans-serif;color:#888; }
+.nn-toggle.active { background:#1a1a3a;color:#00ff88;border-color:#00ff88; }
+.nn-status { padding:14px;text-align:center;font-weight:700;font-size:0.85rem;color:#999; }
+.nn-pg { display:flex;align-items:center;justify-content:center;gap:10px;padding:10px;border-top:1px solid #eee; }
+.nn-pg button { padding:5px 14px;border:2px solid var(--border-light);border-radius:6px;background:#fff;font-weight:800;font-size:0.78rem;cursor:pointer;font-family:'Nunito',sans-serif; }
+.nn-pg button:hover { background:#f0f0ff; }
+.nn-pg button:disabled { opacity:0.4;cursor:not-allowed; }
+.nn-pg span { font-size:0.8rem;font-weight:700;color:#666; }
 table.nt { width:100%;border-collapse:collapse; }
-.nt thead th {
-  text-align:left;padding:10px 14px;font-weight:800;font-size:0.75rem;color:#777;
-  border-bottom:2px solid #eee;background:#fafafe;cursor:pointer;white-space:nowrap;
-}
-.nt thead th:hover { color:var(--accent-blue); }
+.nt thead th { text-align:left;padding:10px 12px;font-weight:800;font-size:0.72rem;color:#777;border-bottom:2px solid #eee;background:#fafafe;white-space:nowrap; }
 .nt tbody tr { border-bottom:1px solid #f0f0f0;transition:background 0.12s; }
 .nt tbody tr:hover { background:#f4f4ff; }
-.nt tbody td { padding:10px 14px;font-weight:700;font-size:0.85rem;white-space:nowrap; }
-.chain-tag {
-  display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:800;
-  background:#e8e8ff;color:#555;
+.nt tbody td { padding:8px 12px;font-weight:700;font-size:0.82rem;white-space:nowrap; }
+.chain-tag { display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.68rem;font-weight:800;background:#e8e8ff;color:#555; }
+.chain-tag.ethereum{background:#627eea22;color:#627eea}.chain-tag.solana{background:#9945ff22;color:#9945ff}.chain-tag.base{background:#0052ff22;color:#0052ff}.chain-tag.arbitrum{background:#28a0f022;color:#2d374b}.chain-tag.bsc{background:#f3ba2f22;color:#b8860b}.chain-tag.polygon{background:#8247e522;color:#8247e5}.chain-tag.avalanche{background:#e8414222;color:#e84142}.chain-tag.optimism{background:#ff042022;color:#ff0420}
+.nf-bar { display:inline-block;height:8px;border-radius:4px;min-width:4px;max-width:60px;vertical-align:middle; }
+.nf-bar.pos{background:var(--green)}.nf-bar.neg{background:var(--red)}
+.flow-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:14px; }
+.flow-card { border:2px solid var(--border-light);border-radius:8px;background:linear-gradient(180deg,#e8e8ff,#d8d8f4);padding:12px;text-align:center;box-shadow:inset 0 1px 0 rgba(255,255,255,0.7); }
+.flow-card .fc-label { font-size:0.65rem;font-weight:800;color:#888;letter-spacing:0.5px;margin-bottom:4px; }
+.flow-card .fc-val { font-family:'Fredoka One',cursive;font-size:1rem; }
+.flow-card .fc-sub { font-size:0.65rem;color:#999;font-weight:700;margin-top:2px; }
+.fc-val.pos{color:var(--green)}.fc-val.neg{color:var(--red)}.fc-val.neutral{color:var(--text-dark)}
+.wallet-summary { display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:14px; }
+.ws-card { border:2px solid var(--border-light);border-radius:8px;background:linear-gradient(180deg,#f0f0ff,#e4e4f8);padding:14px;text-align:center; }
+.ws-card .ws-label { font-size:0.65rem;font-weight:800;color:#888;letter-spacing:0.5px;margin-bottom:4px; }
+.ws-card .ws-val { font-family:'Fredoka One',cursive;font-size:1.2rem;color:var(--text-dark); }
+.ws-card .ws-sub { font-size:0.65rem;color:#999;font-weight:700;margin-top:2px; }
+.signal-row { display:flex;align-items:center;gap:6px;padding:6px 0; }
+.signal-dot { width:10px;height:10px;border-radius:50%; }
+.signal-dot.bullish{background:var(--green)}.signal-dot.bearish{background:var(--red)}.signal-dot.neutral{background:#ccc}
+@media(max-width:768px){
+  .flow-grid{grid-template-columns:repeat(2,1fr)}
+  .wallet-summary{grid-template-columns:repeat(2,1fr)}
+  .nn-tabs{flex-wrap:nowrap}
+  .nn-tab{padding:8px 12px;font-size:0.72rem}
 }
-.chain-tag.ethereum { background:#627eea22;color:#627eea; }
-.chain-tag.solana { background:#9945ff22;color:#9945ff; }
-.chain-tag.base { background:#0052ff22;color:#0052ff; }
-.chain-tag.arbitrum { background:#28a0f022;color:#2d374b; }
-.chain-tag.bsc { background:#f3ba2f22;color:#b8860b; }
-.netflow-bar {
-  display:inline-block;height:8px;border-radius:4px;min-width:4px;max-width:60px;vertical-align:middle;
-}
-.netflow-bar.pos { background:var(--green); }
-.netflow-bar.neg { background:var(--red); }
 
 /* ===== DETAIL PAGE ===== */
 .detail-card {
@@ -389,7 +381,8 @@ table.nt { width:100%;border-collapse:collapse; }
   </div>
   <div class="header-right">
     <div class="header-nav"><a href="#" onclick="goHome();return false">Prices</a></div>
-    <div class="header-nav"><a href="#" onclick="scrollToScreener();return false" style="color:#00aa55">Smart Money</a></div>
+    <div class="header-nav"><a href="#" onclick="scrollToScreener();return false" style="color:#00aa55">Onchain Intel</a></div>
+    <div class="header-nav"><a href="#" onclick="scrollToScreener();nnTab('wallet');return false" style="color:#9945ff">Wallet</a></div>
     <a href="#" class="sign-in-btn">Sign In</a>
     <div class="view-toggle" id="viewToggle">
       <button class="vbtn active" id="bFull" onclick="setView('full')">FULL</button>
@@ -433,17 +426,17 @@ table.nt { width:100%;border-collapse:collapse; }
     </table>
   </div>
 
-  <!-- ===== NANSEN SCREENER ===== -->
-  <div class="nansen-sec anim" id="nansenSection">
-    <div class="nansen-header">
-      <div class="nansen-title">SMART MONEY SCREENER</div>
-      <div class="nansen-badge">Powered by Nansen</div>
+  <!-- ===== NANSEN ANALYTICS DASHBOARD ===== -->
+  <div class="nn anim" id="nansenSection">
+    <div class="nn-hdr">
+      <div class="nn-title">NANSEN ONCHAIN INTELLIGENCE</div>
+      <div class="nn-badge">Powered by Nansen API</div>
     </div>
-    <div class="nansen-controls" id="nansenControls">
+    <div class="nn-key-row">
       <label>API Key:</label>
-      <input type="text" id="nansenKey" placeholder="Enter Nansen API key" style="width:220px">
+      <input type="text" id="nansenKey" placeholder="Enter Nansen API key">
       <label>Chains:</label>
-      <select id="nansenChain" multiple style="width:160px;height:28px">
+      <select id="nnChain" multiple style="width:200px;height:28px">
         <option value="ethereum" selected>Ethereum</option>
         <option value="solana" selected>Solana</option>
         <option value="base" selected>Base</option>
@@ -452,54 +445,225 @@ table.nt { width:100%;border-collapse:collapse; }
         <option value="polygon">Polygon</option>
         <option value="avalanche">Avalanche</option>
         <option value="optimism">Optimism</option>
+        <option value="linea">Linea</option>
+        <option value="scroll">Scroll</option>
+        <option value="blast">Blast</option>
+        <option value="zksync">zkSync</option>
+        <option value="mantle">Mantle</option>
+        <option value="sei">Sei</option>
+        <option value="sonic">Sonic</option>
+        <option value="hyperevm">HyperEVM</option>
+        <option value="monad">Monad</option>
+        <option value="unichain">Unichain</option>
+        <option value="ronin">Ronin</option>
       </select>
-      <label>Window:</label>
-      <select id="nansenTimeframe">
-        <option value="24h">24h</option>
-        <option value="7d">7 days</option>
-        <option value="30d" selected>30 days</option>
-      </select>
-      <button class="nansen-toggle active" id="nansenSMToggle" onclick="toggleSmartMoney()">Smart Money</button>
-      <label>Sort:</label>
-      <select id="nansenSort">
-        <option value="volume">Volume</option>
-        <option value="market_cap_usd">Market Cap</option>
-        <option value="price_change">Price Change</option>
-        <option value="liquidity">Liquidity</option>
-        <option value="netflow">Netflow</option>
-        <option value="token_age_days">Token Age</option>
-      </select>
-      <select id="nansenOrder">
-        <option value="DESC">DESC</option>
-        <option value="ASC">ASC</option>
-      </select>
-      <button class="nansen-go" id="nansenGoBtn" onclick="fetchNansenScreener()">Screen</button>
     </div>
-    <div class="nansen-status" id="nansenStatus">Enter your Nansen API key and click Screen to discover smart money tokens.</div>
-    <table class="nt" style="display:none" id="nansenTable">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Token</th>
-          <th>Chain</th>
-          <th>Price</th>
-          <th>Change</th>
-          <th>Market Cap</th>
-          <th>Volume</th>
-          <th>Buy Vol</th>
-          <th>Sell Vol</th>
-          <th>Netflow</th>
-          <th>Liquidity</th>
-          <th>Age</th>
-        </tr>
-      </thead>
-      <tbody id="nansenBody"></tbody>
-    </table>
-    <div class="nansen-pagination" style="display:none" id="nansenPagination">
-      <button class="nansen-pgbtn" id="nansenPrev" onclick="nansenPage(-1)">Prev</button>
-      <span class="nansen-pginfo" id="nansenPageInfo">Page 1</span>
-      <button class="nansen-pgbtn" id="nansenNext" onclick="nansenPage(1)">Next</button>
+    <div class="nn-tabs">
+      <button class="nn-tab active" onclick="nnTab('screener')">Token Screener</button>
+      <button class="nn-tab" onclick="nnTab('holdings')">SM Holdings</button>
+      <button class="nn-tab" onclick="nnTab('netflows')">SM Netflows</button>
+      <button class="nn-tab" onclick="nnTab('flows')">Flow Intelligence</button>
+      <button class="nn-tab" onclick="nnTab('signals')">Signals</button>
+      <button class="nn-tab" onclick="nnTab('leaderboard')">PnL Leaderboard</button>
+      <button class="nn-tab" onclick="nnTab('wallet')">Wallet Analysis</button>
     </div>
+
+    <!-- TAB: Token Screener -->
+    <div class="nn-panel active" id="nnp-screener">
+      <div class="nn-ctrl">
+        <label>Window:</label>
+        <select id="nnTimeframe">
+          <option value="24h">24h</option>
+          <option value="7d">7 days</option>
+          <option value="30d" selected>30 days</option>
+        </select>
+        <button class="nn-toggle active" id="nnSMToggle" onclick="this.classList.toggle('active')">Smart Money</button>
+        <label>Sort:</label>
+        <select id="nnSort">
+          <option value="volume">Volume</option>
+          <option value="market_cap_usd">Market Cap</option>
+          <option value="price_change">Price Change</option>
+          <option value="liquidity">Liquidity</option>
+          <option value="netflow">Netflow</option>
+          <option value="token_age_days">Token Age</option>
+        </select>
+        <select id="nnOrder">
+          <option value="DESC">DESC</option>
+          <option value="ASC">ASC</option>
+        </select>
+        <button class="nn-btn" id="nnScreenBtn" onclick="nnFetchScreener()">Screen</button>
+      </div>
+      <div class="nn-status" id="nnScreenStatus">Enter your Nansen API key and click Screen to discover smart money tokens.</div>
+      <div style="overflow-x:auto">
+        <table class="nt" style="display:none" id="nnScreenTable">
+          <thead><tr><th>#</th><th>Token</th><th>Chain</th><th>Price</th><th>Change</th><th>MCap</th><th>Volume</th><th>Buy Vol</th><th>Sell Vol</th><th>Netflow</th><th>Liquidity</th><th>Age</th></tr></thead>
+          <tbody id="nnScreenBody"></tbody>
+        </table>
+      </div>
+      <div class="nn-pg" style="display:none" id="nnScreenPg">
+        <button onclick="nnScreenPage(-1)" id="nnScreenPrev">Prev</button>
+        <span id="nnScreenPgInfo">Page 1</span>
+        <button onclick="nnScreenPage(1)" id="nnScreenNext">Next</button>
+      </div>
+    </div>
+
+    <!-- TAB: Smart Money Holdings -->
+    <div class="nn-panel" id="nnp-holdings">
+      <div class="nn-ctrl">
+        <label>Sort:</label>
+        <select id="nnHoldSort">
+          <option value="value_usd" selected>Value (USD)</option>
+          <option value="balance_24h_percent_change">24h Change</option>
+          <option value="holders_count">Holders</option>
+          <option value="market_cap_usd">Market Cap</option>
+        </select>
+        <select id="nnHoldOrder"><option value="DESC">DESC</option><option value="ASC">ASC</option></select>
+        <button class="nn-btn" onclick="nnFetchHoldings()">Fetch Holdings</button>
+      </div>
+      <div class="nn-status" id="nnHoldStatus">Click "Fetch Holdings" to see what smart money is holding.</div>
+      <div style="overflow-x:auto">
+        <table class="nt" style="display:none" id="nnHoldTable">
+          <thead><tr><th>#</th><th>Token</th><th>Chain</th><th>Value (USD)</th><th>Holders</th><th>24h Chg</th><th>MCap</th><th>Share %</th><th>Age</th></tr></thead>
+          <tbody id="nnHoldBody"></tbody>
+        </table>
+      </div>
+      <div class="nn-pg" style="display:none" id="nnHoldPg">
+        <button onclick="nnHoldPage(-1)" id="nnHoldPrev">Prev</button>
+        <span id="nnHoldPgInfo">Page 1</span>
+        <button onclick="nnHoldPage(1)" id="nnHoldNext">Next</button>
+      </div>
+    </div>
+
+    <!-- TAB: Smart Money Netflows -->
+    <div class="nn-panel" id="nnp-netflows">
+      <div class="nn-ctrl">
+        <label>Sort:</label>
+        <select id="nnNfSort">
+          <option value="net_flow_24h_usd" selected>24h Net Flow</option>
+          <option value="net_flow_1h_usd">1h Net Flow</option>
+          <option value="net_flow_7d_usd">7d Net Flow</option>
+          <option value="net_flow_30d_usd">30d Net Flow</option>
+          <option value="market_cap_usd">Market Cap</option>
+        </select>
+        <select id="nnNfOrder"><option value="DESC">DESC</option><option value="ASC">ASC</option></select>
+        <button class="nn-btn" onclick="nnFetchNetflows()">Fetch Netflows</button>
+      </div>
+      <div class="nn-status" id="nnNfStatus">Click "Fetch Netflows" to see smart money capital flows.</div>
+      <div style="overflow-x:auto">
+        <table class="nt" style="display:none" id="nnNfTable">
+          <thead><tr><th>#</th><th>Token</th><th>Chain</th><th>1h Flow</th><th>24h Flow</th><th>7d Flow</th><th>30d Flow</th><th>Traders</th><th>MCap</th><th>Age</th></tr></thead>
+          <tbody id="nnNfBody"></tbody>
+        </table>
+      </div>
+      <div class="nn-pg" style="display:none" id="nnNfPg">
+        <button onclick="nnNfPage(-1)" id="nnNfPrev">Prev</button>
+        <span id="nnNfPgInfo">Page 1</span>
+        <button onclick="nnNfPage(1)" id="nnNfNext">Next</button>
+      </div>
+    </div>
+
+    <!-- TAB: Flow Intelligence -->
+    <div class="nn-panel" id="nnp-flows">
+      <div class="nn-ctrl">
+        <label>Chain:</label>
+        <select id="nnFlowChain">
+          <option value="ethereum">Ethereum</option>
+          <option value="solana">Solana</option>
+          <option value="base">Base</option>
+          <option value="arbitrum">Arbitrum</option>
+          <option value="bsc">BSC</option>
+          <option value="polygon">Polygon</option>
+        </select>
+        <label>Token Address:</label>
+        <input type="text" id="nnFlowToken" placeholder="0x... or mint address" style="width:320px">
+        <label>Window:</label>
+        <select id="nnFlowTf">
+          <option value="1h">1h</option>
+          <option value="24h">24h</option>
+          <option value="7d" selected>7d</option>
+          <option value="30d">30d</option>
+        </select>
+        <button class="nn-btn" onclick="nnFetchFlows()">Analyze Flows</button>
+      </div>
+      <div class="nn-status" id="nnFlowStatus">Enter a token address and click "Analyze Flows" to see categorised flow intelligence.</div>
+      <div id="nnFlowGrid" style="display:none"></div>
+    </div>
+
+    <!-- TAB: Investment Signals -->
+    <div class="nn-panel" id="nnp-signals">
+      <div class="nn-ctrl">
+        <button class="nn-btn" onclick="nnFetchSignals()">Generate Signals</button>
+        <span style="font-size:0.72rem;color:#999;font-weight:700">Analyzes SM holdings + netflows to generate buy/sell signals</span>
+      </div>
+      <div class="nn-status" id="nnSigStatus">Click "Generate Signals" to get investment intelligence from onchain data.</div>
+      <div id="nnSigContent" style="display:none;padding:14px"></div>
+    </div>
+
+    <!-- TAB: PnL Leaderboard -->
+    <div class="nn-panel" id="nnp-leaderboard">
+      <div class="nn-ctrl">
+        <label>Chain:</label>
+        <select id="nnLbChain">
+          <option value="ethereum">Ethereum</option>
+          <option value="solana">Solana</option>
+          <option value="base">Base</option>
+          <option value="arbitrum">Arbitrum</option>
+          <option value="bsc">BSC</option>
+        </select>
+        <label>Token Address:</label>
+        <input type="text" id="nnLbToken" placeholder="0x... or mint address" style="width:320px">
+        <button class="nn-btn" onclick="nnFetchLeaderboard()">Load Leaderboard</button>
+      </div>
+      <div class="nn-status" id="nnLbStatus">Enter a token address to see its top PnL traders.</div>
+      <div style="overflow-x:auto">
+        <table class="nt" style="display:none" id="nnLbTable">
+          <thead><tr><th>#</th><th>Address</th><th>Labels</th><th>Realized PnL</th><th>ROI</th><th>Trades</th><th>Avg Buy</th><th>Avg Sell</th></tr></thead>
+          <tbody id="nnLbBody"></tbody>
+        </table>
+      </div>
+      <div class="nn-pg" style="display:none" id="nnLbPg">
+        <button onclick="nnLbPage(-1)" id="nnLbPrev">Prev</button>
+        <span id="nnLbPgInfo">Page 1</span>
+        <button onclick="nnLbPage(1)" id="nnLbNext">Next</button>
+      </div>
+    </div>
+
+    <!-- TAB: Wallet Analysis -->
+    <div class="nn-panel" id="nnp-wallet">
+      <div class="nn-ctrl">
+        <label>Wallet Address:</label>
+        <input type="text" id="nnWalAddr" placeholder="0x... or Solana address" style="width:380px">
+        <label>Chain:</label>
+        <select id="nnWalChain">
+          <option value="all">All Chains</option>
+          <option value="ethereum">Ethereum</option>
+          <option value="solana">Solana</option>
+          <option value="base">Base</option>
+          <option value="arbitrum">Arbitrum</option>
+          <option value="bsc">BSC</option>
+          <option value="polygon">Polygon</option>
+        </select>
+        <button class="nn-btn" onclick="nnFetchWallet()">Analyze Wallet</button>
+      </div>
+      <div class="nn-status" id="nnWalStatus">Enter a wallet address to deep-dive into holdings, PnL, and counterparties.</div>
+      <div id="nnWalContent" style="display:none">
+        <div class="wallet-summary" id="nnWalSummary"></div>
+        <div style="overflow-x:auto">
+          <table class="nt" id="nnWalBalTable" style="display:none">
+            <thead><tr><th>#</th><th>Token</th><th>Chain</th><th>Balance</th><th>USD Value</th></tr></thead>
+            <tbody id="nnWalBalBody"></tbody>
+          </table>
+        </div>
+        <div style="padding:14px 14px 0"><span style="font-weight:800;font-size:0.8rem;color:#555">Counterparties</span></div>
+        <div style="overflow-x:auto">
+          <table class="nt" id="nnWalCpTable" style="display:none">
+            <thead><tr><th>#</th><th>Address</th><th>Labels</th><th>Interactions</th><th>Volume</th></tr></thead>
+            <tbody id="nnWalCpBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -1088,141 +1252,477 @@ function scrollToScreener() {
   }, 100);
 }
 
-// ==================== NANSEN SCREENER ====================
-var nansenCurrentPage = 1;
-var nansenIsLastPage = true;
-var nansenSmartMoney = true;
+// ==================== NANSEN DASHBOARD ====================
+var NANSEN = 'https://api.nansen.ai/api/v1';
+var NANSEN_BETA = 'https://api.nansen.ai/api/beta';
 
-function toggleSmartMoney() {
-  nansenSmartMoney = !nansenSmartMoney;
-  var btn = document.getElementById('nansenSMToggle');
-  btn.classList.toggle('active', nansenSmartMoney);
+function nnKey() { return document.getElementById('nansenKey').value.trim(); }
+function nnChains() {
+  var s = document.getElementById('nnChain'), c = [];
+  for (var i = 0; i < s.options.length; i++) if (s.options[i].selected) c.push(s.options[i].value);
+  return c.length ? c : ['ethereum'];
 }
 
-async function fetchNansenScreener(page) {
-  var key = document.getElementById('nansenKey').value.trim();
-  if (!key) {
-    document.getElementById('nansenStatus').textContent = 'Please enter a Nansen API key.';
-    document.getElementById('nansenStatus').style.display = '';
-    return;
-  }
-
-  if (page !== undefined) nansenCurrentPage = page;
-
-  var chainSelect = document.getElementById('nansenChain');
-  var chains = [];
-  for (var i = 0; i < chainSelect.options.length; i++) {
-    if (chainSelect.options[i].selected) chains.push(chainSelect.options[i].value);
-  }
-  if (!chains.length) chains = ['ethereum'];
-
-  var timeframe = document.getElementById('nansenTimeframe').value;
-  var sortField = document.getElementById('nansenSort').value;
-  var sortDir = document.getElementById('nansenOrder').value;
-
-  var body = {
-    chains: chains,
-    timeframe: timeframe,
-    pagination: { page: nansenCurrentPage, per_page: 15 },
-    order_by: [{ field: sortField, direction: sortDir }]
-  };
-
-  var filters = {};
-  if (nansenSmartMoney) filters.only_smart_money = true;
-  if (Object.keys(filters).length) body.filters = filters;
-
-  var goBtn = document.getElementById('nansenGoBtn');
-  goBtn.disabled = true;
-  goBtn.textContent = 'Loading...';
-  document.getElementById('nansenStatus').textContent = 'Fetching smart money data...';
-  document.getElementById('nansenStatus').style.display = '';
-  document.getElementById('nansenTable').style.display = 'none';
-  document.getElementById('nansenPagination').style.display = 'none';
-
-  try {
-    var resp = await fetch('https://api.nansen.ai/api/v1/token-screener', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apiKey': key },
-      body: JSON.stringify(body)
-    });
-    if (!resp.ok) {
-      var errText = await resp.text();
-      throw new Error('API error ' + resp.status + ': ' + errText.substring(0, 100));
-    }
-    var result = await resp.json();
-    var data = result.data || [];
-    var pagination = result.pagination || {};
-    nansenIsLastPage = pagination.is_last_page !== false;
-
-    if (!data.length) {
-      document.getElementById('nansenStatus').textContent = 'No tokens found matching the criteria.';
-      return;
-    }
-
-    renderNansenTable(data);
-    document.getElementById('nansenStatus').style.display = 'none';
-    document.getElementById('nansenTable').style.display = '';
-    document.getElementById('nansenPagination').style.display = 'flex';
-    document.getElementById('nansenPageInfo').textContent = 'Page ' + nansenCurrentPage;
-    document.getElementById('nansenPrev').disabled = nansenCurrentPage <= 1;
-    document.getElementById('nansenNext').disabled = nansenIsLastPage;
-
-  } catch (e) {
-    document.getElementById('nansenStatus').textContent = 'Error: ' + e.message;
-  } finally {
-    goBtn.disabled = false;
-    goBtn.textContent = 'Screen';
-  }
-}
-
-function nansenPage(delta) {
-  var newPage = nansenCurrentPage + delta;
-  if (newPage < 1) return;
-  fetchNansenScreener(newPage);
-}
-
-function renderNansenTable(data) {
-  var maxNetflow = 1;
-  data.forEach(function(t) {
-    var nf = Math.abs(t.netflow || 0);
-    if (nf > maxNetflow) maxNetflow = nf;
+async function nnPost(path, body, base) {
+  var key = nnKey();
+  if (!key) throw new Error('Please enter a Nansen API key.');
+  var resp = await fetch((base || NANSEN) + path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'apiKey': key },
+    body: JSON.stringify(body)
   });
+  if (!resp.ok) { var t = await resp.text(); throw new Error('API ' + resp.status + ': ' + t.substring(0, 120)); }
+  return resp.json();
+}
 
-  document.getElementById('nansenBody').innerHTML = data.map(function(t, i) {
-    var sym = t.token_symbol || '???';
-    var chain = t.chain || '';
-    var price = t.price_usd != null ? fmtPrice(t.price_usd) : 'N/A';
-    var chg = t.price_change != null ? t.price_change : 0;
-    var chgStr = (chg >= 0 ? '+' : '') + chg.toFixed(2) + '%';
-    var chgCls = chg >= 0 ? 'up' : 'down';
-    var mcap = fmtVol(t.market_cap_usd);
-    var vol = fmtVol(t.volume);
-    var buyVol = fmtVol(t.buy_volume);
-    var sellVol = fmtVol(t.sell_volume);
-    var netflow = t.netflow || 0;
-    var netflowStr = fmtVol(Math.abs(netflow));
-    if (netflow < 0) netflowStr = '-' + netflowStr;
-    var nfPct = Math.min(Math.abs(netflow) / maxNetflow, 1) * 60;
-    var nfCls = netflow >= 0 ? 'pos' : 'neg';
-    var liq = fmtVol(t.liquidity);
-    var age = t.token_age_days != null ? t.token_age_days + 'd' : 'N/A';
-    var rank = (nansenCurrentPage - 1) * 15 + i + 1;
+function nnTab(name) {
+  document.querySelectorAll('.nn-tab').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.nn-panel').forEach(function(p) { p.classList.remove('active'); });
+  var tabs = document.querySelectorAll('.nn-tab');
+  var map = ['screener','holdings','netflows','flows','signals','leaderboard','wallet'];
+  map.forEach(function(m, i) { if (m === name) tabs[i].classList.add('active'); });
+  var panel = document.getElementById('nnp-' + name);
+  if (panel) panel.classList.add('active');
+}
 
-    return '<tr>' +
-      '<td style="color:#999;font-weight:900">' + rank + '</td>' +
-      '<td><span style="font-weight:900">' + sym + '</span></td>' +
-      '<td><span class="chain-tag ' + chain + '">' + chain + '</span></td>' +
-      '<td>' + price + '</td>' +
-      '<td><span class="chc ' + chgCls + '">' + (chg >= 0 ? '&#9650;' : '&#9660;') + ' ' + Math.abs(chg).toFixed(2) + '%</span></td>' +
-      '<td class="mc">' + mcap + '</td>' +
-      '<td>' + vol + '</td>' +
-      '<td style="color:var(--green)">' + buyVol + '</td>' +
-      '<td style="color:var(--red)">' + sellVol + '</td>' +
-      '<td>' + netflowStr + ' <span class="netflow-bar ' + nfCls + '" style="width:' + nfPct + 'px"></span></td>' +
-      '<td class="mc">' + liq + '</td>' +
-      '<td style="color:#888">' + age + '</td>' +
-    '</tr>';
-  }).join('');
+function nnChainTag(c) { return '<span class="chain-tag ' + c + '">' + c + '</span>'; }
+function nnPct(v) { if (v == null) return 'N/A'; return (v >= 0 ? '+' : '') + v.toFixed(2) + '%'; }
+function nnFlowVal(v) {
+  if (v == null) return '<span style="color:#999">N/A</span>';
+  var s = fmtVol(Math.abs(v));
+  if (v < 0) s = '-' + s;
+  var cls = v > 0 ? 'color:var(--green)' : v < 0 ? 'color:var(--red)' : 'color:#999';
+  return '<span style="' + cls + ';font-weight:800">' + s + '</span>';
+}
+function nnAddr(a) { return a && a.length > 16 ? a.slice(0, 8) + '..' + a.slice(-6) : (a || '???'); }
+
+// ── Tab: Token Screener ────────────────────────────────
+var nnScreenPg = 1, nnScreenLast = true;
+
+async function nnFetchScreener(page) {
+  if (page !== undefined) nnScreenPg = page;
+  var btn = document.getElementById('nnScreenBtn');
+  btn.disabled = true; btn.textContent = 'Loading...';
+  var st = document.getElementById('nnScreenStatus');
+  st.textContent = 'Fetching...'; st.style.display = '';
+  document.getElementById('nnScreenTable').style.display = 'none';
+  document.getElementById('nnScreenPg').style.display = 'none';
+  try {
+    var body = {
+      chains: nnChains(),
+      timeframe: document.getElementById('nnTimeframe').value,
+      pagination: { page: nnScreenPg, per_page: 15 },
+      order_by: [{ field: document.getElementById('nnSort').value, direction: document.getElementById('nnOrder').value }]
+    };
+    if (document.getElementById('nnSMToggle').classList.contains('active')) {
+      body.filters = { only_smart_money: true };
+    }
+    var r = await nnPost('/token-screener', body);
+    var data = r.data || []; var pg = r.pagination || {};
+    nnScreenLast = pg.is_last_page !== false;
+    if (!data.length) { st.textContent = 'No tokens found.'; return; }
+
+    var maxNf = 1;
+    data.forEach(function(t) { var n = Math.abs(t.netflow || 0); if (n > maxNf) maxNf = n; });
+
+    document.getElementById('nnScreenBody').innerHTML = data.map(function(t, i) {
+      var chg = t.price_change || 0;
+      var nf = t.netflow || 0;
+      var nfW = Math.min(Math.abs(nf) / maxNf, 1) * 60;
+      return '<tr>' +
+        '<td style="color:#999;font-weight:900">' + ((nnScreenPg - 1) * 15 + i + 1) + '</td>' +
+        '<td style="font-weight:900">' + (t.token_symbol || '???') + '</td>' +
+        '<td>' + nnChainTag(t.chain || '') + '</td>' +
+        '<td>' + (t.price_usd != null ? fmtPrice(t.price_usd) : 'N/A') + '</td>' +
+        '<td><span class="chc ' + (chg >= 0 ? 'up' : 'down') + '">' + (chg >= 0 ? '&#9650;' : '&#9660;') + ' ' + Math.abs(chg).toFixed(2) + '%</span></td>' +
+        '<td class="mc">' + fmtVol(t.market_cap_usd) + '</td>' +
+        '<td>' + fmtVol(t.volume) + '</td>' +
+        '<td style="color:var(--green)">' + fmtVol(t.buy_volume) + '</td>' +
+        '<td style="color:var(--red)">' + fmtVol(t.sell_volume) + '</td>' +
+        '<td>' + (nf < 0 ? '-' : '') + fmtVol(Math.abs(nf)) + ' <span class="nf-bar ' + (nf >= 0 ? 'pos' : 'neg') + '" style="width:' + nfW + 'px"></span></td>' +
+        '<td class="mc">' + fmtVol(t.liquidity) + '</td>' +
+        '<td style="color:#888">' + (t.token_age_days != null ? t.token_age_days + 'd' : 'N/A') + '</td>' +
+      '</tr>';
+    }).join('');
+
+    st.style.display = 'none';
+    document.getElementById('nnScreenTable').style.display = '';
+    document.getElementById('nnScreenPg').style.display = 'flex';
+    document.getElementById('nnScreenPgInfo').textContent = 'Page ' + nnScreenPg;
+    document.getElementById('nnScreenPrev').disabled = nnScreenPg <= 1;
+    document.getElementById('nnScreenNext').disabled = nnScreenLast;
+  } catch (e) { st.textContent = 'Error: ' + e.message; }
+  finally { btn.disabled = false; btn.textContent = 'Screen'; }
+}
+function nnScreenPage(d) { var p = nnScreenPg + d; if (p >= 1) nnFetchScreener(p); }
+
+// ── Tab: Smart Money Holdings ──────────────────────────
+var nnHoldPgN = 1, nnHoldLast = true;
+
+async function nnFetchHoldings(page) {
+  if (page !== undefined) nnHoldPgN = page;
+  var st = document.getElementById('nnHoldStatus');
+  st.textContent = 'Fetching...'; st.style.display = '';
+  document.getElementById('nnHoldTable').style.display = 'none';
+  document.getElementById('nnHoldPg').style.display = 'none';
+  try {
+    var r = await nnPost('/smart-money/holdings', {
+      chains: nnChains(),
+      pagination: { page: nnHoldPgN, per_page: 15 },
+      filters: { include_stablecoins: false, include_native_tokens: false },
+      order_by: [{ field: document.getElementById('nnHoldSort').value, direction: document.getElementById('nnHoldOrder').value }]
+    });
+    var data = r.data || []; var pg = r.pagination || {};
+    nnHoldLast = pg.is_last_page !== false;
+    if (!data.length) { st.textContent = 'No holdings data found.'; return; }
+
+    document.getElementById('nnHoldBody').innerHTML = data.map(function(t, i) {
+      var chg = t.balance_24h_percent_change;
+      var chgStr = chg != null ? nnPct(chg) : 'N/A';
+      var chgCls = chg >= 0 ? 'up' : 'down';
+      return '<tr>' +
+        '<td style="color:#999;font-weight:900">' + ((nnHoldPgN - 1) * 15 + i + 1) + '</td>' +
+        '<td style="font-weight:900">' + (t.token_symbol || '???') + '</td>' +
+        '<td>' + nnChainTag(t.chain || '') + '</td>' +
+        '<td style="font-weight:800">' + fmtVol(t.value_usd) + '</td>' +
+        '<td>' + (t.holders_count || 0) + '</td>' +
+        '<td><span class="chc ' + chgCls + '">' + chgStr + '</span></td>' +
+        '<td class="mc">' + fmtVol(t.market_cap_usd) + '</td>' +
+        '<td>' + (t.share_of_holdings_percent != null ? t.share_of_holdings_percent.toFixed(2) + '%' : 'N/A') + '</td>' +
+        '<td style="color:#888">' + (t.token_age_days != null ? t.token_age_days + 'd' : 'N/A') + '</td>' +
+      '</tr>';
+    }).join('');
+
+    st.style.display = 'none';
+    document.getElementById('nnHoldTable').style.display = '';
+    document.getElementById('nnHoldPg').style.display = 'flex';
+    document.getElementById('nnHoldPgInfo').textContent = 'Page ' + nnHoldPgN;
+    document.getElementById('nnHoldPrev').disabled = nnHoldPgN <= 1;
+    document.getElementById('nnHoldNext').disabled = nnHoldLast;
+  } catch (e) { st.textContent = 'Error: ' + e.message; }
+}
+function nnHoldPage(d) { var p = nnHoldPgN + d; if (p >= 1) nnFetchHoldings(p); }
+
+// ── Tab: Smart Money Netflows ──────────────────────────
+var nnNfPgN = 1, nnNfLast = true;
+
+async function nnFetchNetflows(page) {
+  if (page !== undefined) nnNfPgN = page;
+  var st = document.getElementById('nnNfStatus');
+  st.textContent = 'Fetching...'; st.style.display = '';
+  document.getElementById('nnNfTable').style.display = 'none';
+  document.getElementById('nnNfPg').style.display = 'none';
+  try {
+    var r = await nnPost('/smart-money/netflow', {
+      chains: nnChains(),
+      pagination: { page: nnNfPgN, per_page: 15 },
+      filters: { include_stablecoins: false, include_native_tokens: false },
+      order_by: [{ field: document.getElementById('nnNfSort').value, direction: document.getElementById('nnNfOrder').value }]
+    });
+    var data = r.data || []; var pg = r.pagination || {};
+    nnNfLast = pg.is_last_page !== false;
+    if (!data.length) { st.textContent = 'No netflow data found.'; return; }
+
+    document.getElementById('nnNfBody').innerHTML = data.map(function(t, i) {
+      return '<tr>' +
+        '<td style="color:#999;font-weight:900">' + ((nnNfPgN - 1) * 15 + i + 1) + '</td>' +
+        '<td style="font-weight:900">' + (t.token_symbol || '???') + '</td>' +
+        '<td>' + nnChainTag(t.chain || '') + '</td>' +
+        '<td>' + nnFlowVal(t.net_flow_1h_usd) + '</td>' +
+        '<td>' + nnFlowVal(t.net_flow_24h_usd) + '</td>' +
+        '<td>' + nnFlowVal(t.net_flow_7d_usd) + '</td>' +
+        '<td>' + nnFlowVal(t.net_flow_30d_usd) + '</td>' +
+        '<td>' + (t.trader_count || 0) + '</td>' +
+        '<td class="mc">' + fmtVol(t.market_cap_usd) + '</td>' +
+        '<td style="color:#888">' + (t.token_age_days != null ? t.token_age_days + 'd' : 'N/A') + '</td>' +
+      '</tr>';
+    }).join('');
+
+    st.style.display = 'none';
+    document.getElementById('nnNfTable').style.display = '';
+    document.getElementById('nnNfPg').style.display = 'flex';
+    document.getElementById('nnNfPgInfo').textContent = 'Page ' + nnNfPgN;
+    document.getElementById('nnNfPrev').disabled = nnNfPgN <= 1;
+    document.getElementById('nnNfNext').disabled = nnNfLast;
+  } catch (e) { st.textContent = 'Error: ' + e.message; }
+}
+function nnNfPage(d) { var p = nnNfPgN + d; if (p >= 1) nnFetchNetflows(p); }
+
+// ── Tab: Flow Intelligence ─────────────────────────────
+async function nnFetchFlows() {
+  var st = document.getElementById('nnFlowStatus');
+  var token = document.getElementById('nnFlowToken').value.trim();
+  if (!token) { st.textContent = 'Please enter a token address.'; st.style.display = ''; return; }
+  st.textContent = 'Fetching flow intelligence...'; st.style.display = '';
+  document.getElementById('nnFlowGrid').style.display = 'none';
+  try {
+    var chain = document.getElementById('nnFlowChain').value;
+    var tf = document.getElementById('nnFlowTf').value;
+    var r = await nnPost('/tgm/flow-intelligence', { chain: chain, token_address: token, timeframe: tf });
+    var data = r.data;
+    var row = Array.isArray(data) ? data[0] : data;
+    if (!row) { st.textContent = 'No flow data found.'; return; }
+
+    var segments = [
+      { label: 'EXCHANGES', key: 'exchange', icon: '🏦' },
+      { label: 'SMART TRADERS', key: 'smart_trader', icon: '🧠' },
+      { label: 'WHALES', key: 'whale', icon: '🐋' },
+      { label: 'TOP PnL', key: 'top_pnl', icon: '📈' },
+      { label: 'PUBLIC FIGURES', key: 'public_figure', icon: '👤' },
+      { label: 'FRESH WALLETS', key: 'fresh_wallets', icon: '🆕' }
+    ];
+
+    var html = '<div class="flow-grid">';
+    segments.forEach(function(seg) {
+      var nf = row[seg.key + '_net_flow_usd'];
+      var wc = row[seg.key + '_wallet_count'] || 0;
+      var cls = nf > 0 ? 'pos' : nf < 0 ? 'neg' : 'neutral';
+      html += '<div class="flow-card">' +
+        '<div class="fc-label">' + seg.icon + ' ' + seg.label + '</div>' +
+        '<div class="fc-val ' + cls + '">' + (nf != null ? (nf < 0 ? '-' : '+') + fmtVol(Math.abs(nf)) : 'N/A') + '</div>' +
+        '<div class="fc-sub">' + wc + ' wallets</div>' +
+      '</div>';
+    });
+    html += '</div>';
+
+    // Summary bar
+    var exNf = row.exchange_net_flow_usd || 0;
+    var smNf = row.smart_trader_net_flow_usd || 0;
+    var whNf = row.whale_net_flow_usd || 0;
+    var totalNf = exNf + smNf + whNf;
+    html += '<div style="padding:0 14px 14px;text-align:center">' +
+      '<div style="font-weight:800;font-size:0.8rem;color:#555;margin-bottom:4px">COMBINED NET FLOW (Exchange + SM + Whale)</div>' +
+      '<div style="font-family:Fredoka One,cursive;font-size:1.5rem;' + (totalNf >= 0 ? 'color:var(--green)' : 'color:var(--red)') + '">' +
+      (totalNf >= 0 ? '+' : '-') + fmtVol(Math.abs(totalNf)) + '</div></div>';
+
+    document.getElementById('nnFlowGrid').innerHTML = html;
+    st.style.display = 'none';
+    document.getElementById('nnFlowGrid').style.display = 'block';
+  } catch (e) { st.textContent = 'Error: ' + e.message; }
+}
+
+// ── Tab: Investment Signals ────────────────────────────
+async function nnFetchSignals() {
+  var st = document.getElementById('nnSigStatus');
+  st.textContent = 'Generating signals from onchain data...'; st.style.display = '';
+  document.getElementById('nnSigContent').style.display = 'none';
+  try {
+    // Fetch both holdings and netflows to generate signals
+    var chains = nnChains();
+    var holdP = nnPost('/smart-money/holdings', {
+      chains: chains, pagination: { page: 1, per_page: 10 },
+      filters: { include_stablecoins: false, include_native_tokens: false },
+      order_by: [{ field: 'balance_24h_percent_change', direction: 'DESC' }]
+    });
+    var nfP = nnPost('/smart-money/netflow', {
+      chains: chains, pagination: { page: 1, per_page: 10 },
+      filters: { include_stablecoins: false, include_native_tokens: false },
+      order_by: [{ field: 'net_flow_24h_usd', direction: 'DESC' }]
+    });
+    var sellNfP = nnPost('/smart-money/netflow', {
+      chains: chains, pagination: { page: 1, per_page: 10 },
+      filters: { include_stablecoins: false, include_native_tokens: false },
+      order_by: [{ field: 'net_flow_24h_usd', direction: 'ASC' }]
+    });
+
+    var results = await Promise.all([holdP, nfP, sellNfP]);
+    var holdings = (results[0].data || []).slice(0, 8);
+    var inflows = (results[1].data || []).slice(0, 8);
+    var outflows = (results[2].data || []).slice(0, 8);
+
+    var html = '';
+
+    // Accumulating section
+    html += '<div style="margin-bottom:18px">' +
+      '<div style="font-weight:900;font-size:0.9rem;color:var(--green);margin-bottom:8px">BULLISH SIGNALS — Smart Money Accumulating</div>' +
+      '<div style="font-size:0.72rem;color:#999;margin-bottom:10px">Tokens with strongest SM inflows and rising holdings in the last 24h</div>';
+    inflows.forEach(function(t) {
+      var nf = t.net_flow_24h_usd || 0;
+      if (nf <= 0) return;
+      var strength = nf > 1000000 ? 'STRONG BUY' : nf > 100000 ? 'BUY' : 'WATCH';
+      var dotCls = strength === 'STRONG BUY' ? 'bullish' : strength === 'BUY' ? 'bullish' : 'neutral';
+      html += '<div class="signal-row">' +
+        '<div class="signal-dot ' + dotCls + '"></div>' +
+        '<span style="font-weight:900;font-size:0.85rem;min-width:80px">' + (t.token_symbol || '???') + '</span>' +
+        ' ' + nnChainTag(t.chain || '') +
+        '<span style="color:var(--green);font-weight:800;font-size:0.82rem;margin-left:8px">+' + fmtVol(nf) + ' net inflow</span>' +
+        '<span style="font-weight:800;font-size:0.72rem;color:#555;margin-left:auto;background:' + (strength === 'STRONG BUY' ? '#00cc5533' : '#ffcc0033') + ';padding:2px 10px;border-radius:10px">' + strength + '</span>' +
+      '</div>';
+    });
+    html += '</div>';
+
+    // Distribution section
+    html += '<div style="margin-bottom:18px">' +
+      '<div style="font-weight:900;font-size:0.9rem;color:var(--red);margin-bottom:8px">BEARISH SIGNALS — Smart Money Distributing</div>' +
+      '<div style="font-size:0.72rem;color:#999;margin-bottom:10px">Tokens with strongest SM outflows in the last 24h</div>';
+    outflows.forEach(function(t) {
+      var nf = t.net_flow_24h_usd || 0;
+      if (nf >= 0) return;
+      var strength = nf < -1000000 ? 'STRONG SELL' : nf < -100000 ? 'SELL' : 'CAUTION';
+      html += '<div class="signal-row">' +
+        '<div class="signal-dot bearish"></div>' +
+        '<span style="font-weight:900;font-size:0.85rem;min-width:80px">' + (t.token_symbol || '???') + '</span>' +
+        ' ' + nnChainTag(t.chain || '') +
+        '<span style="color:var(--red);font-weight:800;font-size:0.82rem;margin-left:8px">' + fmtVol(Math.abs(nf)) + ' net outflow</span>' +
+        '<span style="font-weight:800;font-size:0.72rem;color:#555;margin-left:auto;background:#dd223333;padding:2px 10px;border-radius:10px">' + strength + '</span>' +
+      '</div>';
+    });
+    html += '</div>';
+
+    // Top Holdings section
+    html += '<div>' +
+      '<div style="font-weight:900;font-size:0.9rem;color:var(--accent-blue);margin-bottom:8px">TOP SM HOLDINGS — Highest Conviction Positions</div>' +
+      '<div style="font-size:0.72rem;color:#999;margin-bottom:10px">Tokens with largest SM holding value, sorted by 24h balance increase</div>';
+    holdings.forEach(function(t) {
+      var chg = t.balance_24h_percent_change;
+      html += '<div class="signal-row">' +
+        '<div class="signal-dot ' + (chg > 0 ? 'bullish' : chg < 0 ? 'bearish' : 'neutral') + '"></div>' +
+        '<span style="font-weight:900;font-size:0.85rem;min-width:80px">' + (t.token_symbol || '???') + '</span>' +
+        ' ' + nnChainTag(t.chain || '') +
+        '<span style="font-weight:800;font-size:0.82rem;margin-left:8px">' + fmtVol(t.value_usd) + ' held</span>' +
+        '<span style="font-weight:700;font-size:0.78rem;margin-left:8px;color:' + (chg >= 0 ? 'var(--green)' : 'var(--red)') + '">' + nnPct(chg) + ' 24h</span>' +
+        '<span style="color:#888;font-weight:700;font-size:0.72rem;margin-left:auto">' + (t.holders_count || 0) + ' holders</span>' +
+      '</div>';
+    });
+    html += '</div>';
+
+    document.getElementById('nnSigContent').innerHTML = html;
+    st.style.display = 'none';
+    document.getElementById('nnSigContent').style.display = 'block';
+  } catch (e) { st.textContent = 'Error: ' + e.message; }
+}
+
+// ── Tab: PnL Leaderboard ───────────────────────────────
+var nnLbPgN = 1, nnLbLast = true;
+
+async function nnFetchLeaderboard(page) {
+  if (page !== undefined) nnLbPgN = page;
+  var st = document.getElementById('nnLbStatus');
+  var token = document.getElementById('nnLbToken').value.trim();
+  if (!token) { st.textContent = 'Please enter a token address.'; st.style.display = ''; return; }
+  st.textContent = 'Fetching...'; st.style.display = '';
+  document.getElementById('nnLbTable').style.display = 'none';
+  document.getElementById('nnLbPg').style.display = 'none';
+  try {
+    var r = await nnPost('/tgm/pnl-leaderboard', {
+      chain: document.getElementById('nnLbChain').value,
+      token_address: token,
+      pagination: { page: nnLbPgN, per_page: 15 }
+    });
+    var data = r.data || []; var pg = r.pagination || {};
+    nnLbLast = pg.is_last_page !== false;
+    if (!data.length) { st.textContent = 'No leaderboard data found.'; return; }
+
+    document.getElementById('nnLbBody').innerHTML = data.map(function(t, i) {
+      var addr = t.address || '???';
+      var labels = (t.labels || []).join(', ') || '-';
+      var pnl = t.pnl_usd_realised;
+      var roi = t.roi_percent_realised;
+      var trades = t.nof_trades || 0;
+      var avgBuy = t.avg_buy_price_usd;
+      var avgSell = t.avg_sell_price_usd;
+      return '<tr>' +
+        '<td style="color:#999;font-weight:900">' + ((nnLbPgN - 1) * 15 + i + 1) + '</td>' +
+        '<td style="font-family:monospace;font-size:0.75rem">' + nnAddr(addr) + '</td>' +
+        '<td style="font-size:0.72rem">' + labels + '</td>' +
+        '<td style="color:' + (pnl >= 0 ? 'var(--green)' : 'var(--red)') + ';font-weight:800">' + (pnl != null ? fmtVol(pnl) : 'N/A') + '</td>' +
+        '<td style="color:' + (roi >= 0 ? 'var(--green)' : 'var(--red)') + ';font-weight:800">' + (roi != null ? nnPct(roi) : 'N/A') + '</td>' +
+        '<td>' + trades + '</td>' +
+        '<td>' + (avgBuy != null ? fmtPrice(avgBuy) : 'N/A') + '</td>' +
+        '<td>' + (avgSell != null ? fmtPrice(avgSell) : 'N/A') + '</td>' +
+      '</tr>';
+    }).join('');
+
+    st.style.display = 'none';
+    document.getElementById('nnLbTable').style.display = '';
+    document.getElementById('nnLbPg').style.display = 'flex';
+    document.getElementById('nnLbPgInfo').textContent = 'Page ' + nnLbPgN;
+    document.getElementById('nnLbPrev').disabled = nnLbPgN <= 1;
+    document.getElementById('nnLbNext').disabled = nnLbLast;
+  } catch (e) { st.textContent = 'Error: ' + e.message; }
+}
+function nnLbPage(d) { var p = nnLbPgN + d; if (p >= 1) nnFetchLeaderboard(p); }
+
+// ── Tab: Wallet Analysis ───────────────────────────────
+async function nnFetchWallet() {
+  var st = document.getElementById('nnWalStatus');
+  var addr = document.getElementById('nnWalAddr').value.trim();
+  if (!addr) { st.textContent = 'Please enter a wallet address.'; st.style.display = ''; return; }
+  st.textContent = 'Analyzing wallet...'; st.style.display = '';
+  document.getElementById('nnWalContent').style.display = 'none';
+
+  var chain = document.getElementById('nnWalChain').value;
+  var summaryHtml = '';
+  var balRows = '';
+  var cpRows = '';
+
+  // PnL Summary
+  try {
+    var pnl = await nnPost('/profiler/address/pnl-summary', { address: addr, chain: chain });
+    var rp = pnl.realized_pnl_usd;
+    var wr = pnl.win_rate;
+    var trades = pnl.traded_times || 0;
+    var tokens = pnl.traded_token_count || 0;
+    summaryHtml = '<div class="wallet-summary">' +
+      '<div class="ws-card"><div class="ws-label">REALIZED PnL</div><div class="ws-val" style="color:' + (rp >= 0 ? 'var(--green)' : 'var(--red)') + '">' + (rp != null ? fmtVol(rp) : 'N/A') + '</div></div>' +
+      '<div class="ws-card"><div class="ws-label">WIN RATE</div><div class="ws-val">' + (wr != null ? (wr * 100).toFixed(0) + '%' : 'N/A') + '</div></div>' +
+      '<div class="ws-card"><div class="ws-label">TRADES</div><div class="ws-val">' + trades + '</div></div>' +
+      '<div class="ws-card"><div class="ws-label">TOKENS TRADED</div><div class="ws-val">' + tokens + '</div></div>' +
+    '</div>';
+  } catch (e) {
+    summaryHtml = '<div style="padding:14px;color:#999;text-align:center">PnL data unavailable: ' + e.message + '</div>';
+  }
+
+  // Balances
+  try {
+    var bal = await nnPost('/profiler/address/balances', {
+      parameters: { chain: chain, walletAddresses: [addr] },
+      pagination: { page: 1, recordsPerPage: 50 }
+    }, NANSEN_BETA);
+    var balData = Array.isArray(bal) ? bal : (bal.data || []);
+    balData.sort(function(a, b) { return (b.usdValue || 0) - (a.usdValue || 0); });
+    balRows = balData.slice(0, 20).map(function(b, i) {
+      return '<tr>' +
+        '<td style="color:#999;font-weight:900">' + (i + 1) + '</td>' +
+        '<td style="font-weight:900">' + (b.symbol || '???') + '</td>' +
+        '<td>' + nnChainTag(b.chain || '') + '</td>' +
+        '<td>' + (b.tokenAmount != null ? parseFloat(b.tokenAmount).toLocaleString('en-US', {maximumFractionDigits: 4}) : 'N/A') + '</td>' +
+        '<td style="font-weight:800">' + fmtVol(b.usdValue) + '</td>' +
+      '</tr>';
+    }).join('');
+  } catch (e) {
+    balRows = '<tr><td colspan="5" style="color:#999;text-align:center">Balance data unavailable</td></tr>';
+  }
+
+  // Counterparties
+  try {
+    var cp = await nnPost('/profiler/address/counterparties', {
+      parameters: { walletAddresses: [addr], chain: chain, groupBy: 'wallet' },
+      pagination: { page: 1, recordsPerPage: 15 }
+    }, NANSEN_BETA);
+    var cpData = Array.isArray(cp) ? cp : (cp.data || []);
+    cpRows = cpData.slice(0, 10).map(function(c, i) {
+      var labels = (c.labels || []).join(', ') || '-';
+      return '<tr>' +
+        '<td style="color:#999;font-weight:900">' + (i + 1) + '</td>' +
+        '<td style="font-family:monospace;font-size:0.75rem">' + nnAddr(c.address || c.counterparty_address) + '</td>' +
+        '<td style="font-size:0.72rem">' + labels + '</td>' +
+        '<td>' + (c.interactions || c.transaction_count || 0) + '</td>' +
+        '<td style="font-weight:800">' + fmtVol(c.volume_usd || c.total_usd_value) + '</td>' +
+      '</tr>';
+    }).join('');
+  } catch (e) {
+    cpRows = '<tr><td colspan="5" style="color:#999;text-align:center">Counterparty data unavailable</td></tr>';
+  }
+
+  document.getElementById('nnWalSummary').innerHTML = summaryHtml;
+  document.getElementById('nnWalBalBody').innerHTML = balRows;
+  document.getElementById('nnWalBalTable').style.display = balRows ? '' : 'none';
+  document.getElementById('nnWalCpBody').innerHTML = cpRows;
+  document.getElementById('nnWalCpTable').style.display = cpRows ? '' : 'none';
+
+  st.style.display = 'none';
+  document.getElementById('nnWalContent').style.display = 'block';
 }
 
 // Persist Nansen API key in localStorage
