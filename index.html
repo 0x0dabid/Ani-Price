@@ -147,6 +147,74 @@ table.ct{width:100%;border-collapse:collapse}
 .mc{font-weight:700;color:#666}
 .slc{width:90px;height:28px}.slc svg{width:100%;height:100%}
 
+/* ===== NANSEN SCREENER ===== */
+.nansen-sec {
+  margin:16px 20px; border:3px solid var(--border); border-radius:8px;
+  background:var(--card-bg); overflow:hidden;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5), 0 3px 10px rgba(50,50,150,0.1);
+}
+.nansen-header {
+  display:flex;align-items:center;justify-content:space-between;padding:8px 14px;
+  border-bottom:2px solid var(--border);
+  background:linear-gradient(90deg,#1a1a3a,#2a2a5a);
+}
+.nansen-title { font-weight:900;font-size:0.85rem;color:#00ff88;letter-spacing:1px; }
+.nansen-badge { font-size:0.65rem;font-weight:800;color:#aaf;background:rgba(255,255,255,0.1);padding:3px 10px;border-radius:12px; }
+.nansen-controls {
+  display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px;
+  border-bottom:1px solid #eee;background:#fafafe;align-items:center;
+}
+.nansen-controls label { font-size:0.75rem;font-weight:800;color:#666; }
+.nansen-controls select,.nansen-controls input[type="text"],.nansen-controls input[type="number"] {
+  padding:5px 10px;border:2px solid #ccc;border-radius:6px;font-size:0.78rem;
+  font-family:'Nunito',sans-serif;font-weight:600;outline:none;
+}
+.nansen-controls select:focus,.nansen-controls input:focus { border-color:var(--accent-blue); }
+.nansen-go {
+  padding:6px 20px;background:linear-gradient(180deg,#00cc55,#009944);color:#fff;
+  border:2px solid #007733;border-radius:6px;font-weight:900;font-size:0.8rem;
+  cursor:pointer;font-family:'Nunito',sans-serif;transition:transform 0.1s;
+}
+.nansen-go:hover { transform:translateY(-1px); }
+.nansen-go:disabled { opacity:0.5;cursor:not-allowed;transform:none; }
+.nansen-toggle {
+  padding:5px 14px;background:transparent;border:2px solid var(--border-light);border-radius:6px;
+  font-weight:800;font-size:0.75rem;cursor:pointer;font-family:'Nunito',sans-serif;color:#888;
+}
+.nansen-toggle.active { background:#1a1a3a;color:#00ff88;border-color:#00ff88; }
+.nansen-status { padding:12px 14px;text-align:center;font-weight:700;font-size:0.85rem;color:#999; }
+.nansen-pagination { display:flex;align-items:center;justify-content:center;gap:10px;padding:10px;border-top:1px solid #eee; }
+.nansen-pgbtn {
+  padding:5px 14px;border:2px solid var(--border-light);border-radius:6px;
+  background:#fff;font-weight:800;font-size:0.78rem;cursor:pointer;font-family:'Nunito',sans-serif;
+}
+.nansen-pgbtn:hover { background:#f0f0ff; }
+.nansen-pgbtn:disabled { opacity:0.4;cursor:not-allowed; }
+.nansen-pginfo { font-size:0.8rem;font-weight:700;color:#666; }
+table.nt { width:100%;border-collapse:collapse; }
+.nt thead th {
+  text-align:left;padding:10px 14px;font-weight:800;font-size:0.75rem;color:#777;
+  border-bottom:2px solid #eee;background:#fafafe;cursor:pointer;white-space:nowrap;
+}
+.nt thead th:hover { color:var(--accent-blue); }
+.nt tbody tr { border-bottom:1px solid #f0f0f0;transition:background 0.12s; }
+.nt tbody tr:hover { background:#f4f4ff; }
+.nt tbody td { padding:10px 14px;font-weight:700;font-size:0.85rem;white-space:nowrap; }
+.chain-tag {
+  display:inline-block;padding:2px 8px;border-radius:10px;font-size:0.7rem;font-weight:800;
+  background:#e8e8ff;color:#555;
+}
+.chain-tag.ethereum { background:#627eea22;color:#627eea; }
+.chain-tag.solana { background:#9945ff22;color:#9945ff; }
+.chain-tag.base { background:#0052ff22;color:#0052ff; }
+.chain-tag.arbitrum { background:#28a0f022;color:#2d374b; }
+.chain-tag.bsc { background:#f3ba2f22;color:#b8860b; }
+.netflow-bar {
+  display:inline-block;height:8px;border-radius:4px;min-width:4px;max-width:60px;vertical-align:middle;
+}
+.netflow-bar.pos { background:var(--green); }
+.netflow-bar.neg { background:var(--red); }
+
 /* ===== DETAIL PAGE ===== */
 .detail-card {
   margin:16px 20px; border:3px solid var(--border); border-radius:10px;
@@ -321,6 +389,7 @@ table.ct{width:100%;border-collapse:collapse}
   </div>
   <div class="header-right">
     <div class="header-nav"><a href="#" onclick="goHome();return false">Prices</a></div>
+    <div class="header-nav"><a href="#" onclick="scrollToScreener();return false" style="color:#00aa55">Smart Money</a></div>
     <a href="#" class="sign-in-btn">Sign In</a>
     <div class="view-toggle" id="viewToggle">
       <button class="vbtn active" id="bFull" onclick="setView('full')">FULL</button>
@@ -362,6 +431,75 @@ table.ct{width:100%;border-collapse:collapse}
       <thead><tr><th style="width:45px"></th><th>Name</th><th>Price</th><th>% Change</th><th>Market Cap</th><th>Weekly Trend</th></tr></thead>
       <tbody id="tBody"></tbody>
     </table>
+  </div>
+
+  <!-- ===== NANSEN SCREENER ===== -->
+  <div class="nansen-sec anim" id="nansenSection">
+    <div class="nansen-header">
+      <div class="nansen-title">SMART MONEY SCREENER</div>
+      <div class="nansen-badge">Powered by Nansen</div>
+    </div>
+    <div class="nansen-controls" id="nansenControls">
+      <label>API Key:</label>
+      <input type="text" id="nansenKey" placeholder="Enter Nansen API key" style="width:220px">
+      <label>Chains:</label>
+      <select id="nansenChain" multiple style="width:160px;height:28px">
+        <option value="ethereum" selected>Ethereum</option>
+        <option value="solana" selected>Solana</option>
+        <option value="base" selected>Base</option>
+        <option value="arbitrum">Arbitrum</option>
+        <option value="bsc">BSC</option>
+        <option value="polygon">Polygon</option>
+        <option value="avalanche">Avalanche</option>
+        <option value="optimism">Optimism</option>
+      </select>
+      <label>Window:</label>
+      <select id="nansenTimeframe">
+        <option value="24h">24h</option>
+        <option value="7d">7 days</option>
+        <option value="30d" selected>30 days</option>
+      </select>
+      <button class="nansen-toggle active" id="nansenSMToggle" onclick="toggleSmartMoney()">Smart Money</button>
+      <label>Sort:</label>
+      <select id="nansenSort">
+        <option value="volume">Volume</option>
+        <option value="market_cap_usd">Market Cap</option>
+        <option value="price_change">Price Change</option>
+        <option value="liquidity">Liquidity</option>
+        <option value="netflow">Netflow</option>
+        <option value="token_age_days">Token Age</option>
+      </select>
+      <select id="nansenOrder">
+        <option value="DESC">DESC</option>
+        <option value="ASC">ASC</option>
+      </select>
+      <button class="nansen-go" id="nansenGoBtn" onclick="fetchNansenScreener()">Screen</button>
+    </div>
+    <div class="nansen-status" id="nansenStatus">Enter your Nansen API key and click Screen to discover smart money tokens.</div>
+    <table class="nt" style="display:none" id="nansenTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Token</th>
+          <th>Chain</th>
+          <th>Price</th>
+          <th>Change</th>
+          <th>Market Cap</th>
+          <th>Volume</th>
+          <th>Buy Vol</th>
+          <th>Sell Vol</th>
+          <th>Netflow</th>
+          <th>Liquidity</th>
+          <th>Age</th>
+        </tr>
+      </thead>
+      <tbody id="nansenBody"></tbody>
+    </table>
+    <div class="nansen-pagination" style="display:none" id="nansenPagination">
+      <button class="nansen-pgbtn" id="nansenPrev" onclick="nansenPage(-1)">Prev</button>
+      <span class="nansen-pginfo" id="nansenPageInfo">Page 1</span>
+      <button class="nansen-pgbtn" id="nansenNext" onclick="nansenPage(1)">Next</button>
+    </div>
   </div>
 </div>
 
@@ -942,6 +1080,159 @@ document.getElementById('dChartWrap').addEventListener('mousemove', function(e) 
 document.getElementById('dChartWrap').addEventListener('mouseleave', function() {
   document.getElementById('crossV').style.display = 'none';
 });
+
+function scrollToScreener() {
+  goHome();
+  setTimeout(function() {
+    document.getElementById('nansenSection').scrollIntoView({behavior:'smooth'});
+  }, 100);
+}
+
+// ==================== NANSEN SCREENER ====================
+var nansenCurrentPage = 1;
+var nansenIsLastPage = true;
+var nansenSmartMoney = true;
+
+function toggleSmartMoney() {
+  nansenSmartMoney = !nansenSmartMoney;
+  var btn = document.getElementById('nansenSMToggle');
+  btn.classList.toggle('active', nansenSmartMoney);
+}
+
+async function fetchNansenScreener(page) {
+  var key = document.getElementById('nansenKey').value.trim();
+  if (!key) {
+    document.getElementById('nansenStatus').textContent = 'Please enter a Nansen API key.';
+    document.getElementById('nansenStatus').style.display = '';
+    return;
+  }
+
+  if (page !== undefined) nansenCurrentPage = page;
+
+  var chainSelect = document.getElementById('nansenChain');
+  var chains = [];
+  for (var i = 0; i < chainSelect.options.length; i++) {
+    if (chainSelect.options[i].selected) chains.push(chainSelect.options[i].value);
+  }
+  if (!chains.length) chains = ['ethereum'];
+
+  var timeframe = document.getElementById('nansenTimeframe').value;
+  var sortField = document.getElementById('nansenSort').value;
+  var sortDir = document.getElementById('nansenOrder').value;
+
+  var body = {
+    chains: chains,
+    timeframe: timeframe,
+    pagination: { page: nansenCurrentPage, per_page: 15 },
+    order_by: [{ field: sortField, direction: sortDir }]
+  };
+
+  var filters = {};
+  if (nansenSmartMoney) filters.only_smart_money = true;
+  if (Object.keys(filters).length) body.filters = filters;
+
+  var goBtn = document.getElementById('nansenGoBtn');
+  goBtn.disabled = true;
+  goBtn.textContent = 'Loading...';
+  document.getElementById('nansenStatus').textContent = 'Fetching smart money data...';
+  document.getElementById('nansenStatus').style.display = '';
+  document.getElementById('nansenTable').style.display = 'none';
+  document.getElementById('nansenPagination').style.display = 'none';
+
+  try {
+    var resp = await fetch('https://api.nansen.ai/api/v1/token-screener', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apiKey': key },
+      body: JSON.stringify(body)
+    });
+    if (!resp.ok) {
+      var errText = await resp.text();
+      throw new Error('API error ' + resp.status + ': ' + errText.substring(0, 100));
+    }
+    var result = await resp.json();
+    var data = result.data || [];
+    var pagination = result.pagination || {};
+    nansenIsLastPage = pagination.is_last_page !== false;
+
+    if (!data.length) {
+      document.getElementById('nansenStatus').textContent = 'No tokens found matching the criteria.';
+      return;
+    }
+
+    renderNansenTable(data);
+    document.getElementById('nansenStatus').style.display = 'none';
+    document.getElementById('nansenTable').style.display = '';
+    document.getElementById('nansenPagination').style.display = 'flex';
+    document.getElementById('nansenPageInfo').textContent = 'Page ' + nansenCurrentPage;
+    document.getElementById('nansenPrev').disabled = nansenCurrentPage <= 1;
+    document.getElementById('nansenNext').disabled = nansenIsLastPage;
+
+  } catch (e) {
+    document.getElementById('nansenStatus').textContent = 'Error: ' + e.message;
+  } finally {
+    goBtn.disabled = false;
+    goBtn.textContent = 'Screen';
+  }
+}
+
+function nansenPage(delta) {
+  var newPage = nansenCurrentPage + delta;
+  if (newPage < 1) return;
+  fetchNansenScreener(newPage);
+}
+
+function renderNansenTable(data) {
+  var maxNetflow = 1;
+  data.forEach(function(t) {
+    var nf = Math.abs(t.netflow || 0);
+    if (nf > maxNetflow) maxNetflow = nf;
+  });
+
+  document.getElementById('nansenBody').innerHTML = data.map(function(t, i) {
+    var sym = t.token_symbol || '???';
+    var chain = t.chain || '';
+    var price = t.price_usd != null ? fmtPrice(t.price_usd) : 'N/A';
+    var chg = t.price_change != null ? t.price_change : 0;
+    var chgStr = (chg >= 0 ? '+' : '') + chg.toFixed(2) + '%';
+    var chgCls = chg >= 0 ? 'up' : 'down';
+    var mcap = fmtVol(t.market_cap_usd);
+    var vol = fmtVol(t.volume);
+    var buyVol = fmtVol(t.buy_volume);
+    var sellVol = fmtVol(t.sell_volume);
+    var netflow = t.netflow || 0;
+    var netflowStr = fmtVol(Math.abs(netflow));
+    if (netflow < 0) netflowStr = '-' + netflowStr;
+    var nfPct = Math.min(Math.abs(netflow) / maxNetflow, 1) * 60;
+    var nfCls = netflow >= 0 ? 'pos' : 'neg';
+    var liq = fmtVol(t.liquidity);
+    var age = t.token_age_days != null ? t.token_age_days + 'd' : 'N/A';
+    var rank = (nansenCurrentPage - 1) * 15 + i + 1;
+
+    return '<tr>' +
+      '<td style="color:#999;font-weight:900">' + rank + '</td>' +
+      '<td><span style="font-weight:900">' + sym + '</span></td>' +
+      '<td><span class="chain-tag ' + chain + '">' + chain + '</span></td>' +
+      '<td>' + price + '</td>' +
+      '<td><span class="chc ' + chgCls + '">' + (chg >= 0 ? '&#9650;' : '&#9660;') + ' ' + Math.abs(chg).toFixed(2) + '%</span></td>' +
+      '<td class="mc">' + mcap + '</td>' +
+      '<td>' + vol + '</td>' +
+      '<td style="color:var(--green)">' + buyVol + '</td>' +
+      '<td style="color:var(--red)">' + sellVol + '</td>' +
+      '<td>' + netflowStr + ' <span class="netflow-bar ' + nfCls + '" style="width:' + nfPct + 'px"></span></td>' +
+      '<td class="mc">' + liq + '</td>' +
+      '<td style="color:#888">' + age + '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+// Persist Nansen API key in localStorage
+(function() {
+  var savedKey = localStorage.getItem('nansen_api_key');
+  if (savedKey) document.getElementById('nansenKey').value = savedKey;
+  document.getElementById('nansenKey').addEventListener('change', function() {
+    localStorage.setItem('nansen_api_key', this.value.trim());
+  });
+})();
 
 // ==================== INIT ====================
 renderTable(coins); // Show skeleton immediately

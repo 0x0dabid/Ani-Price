@@ -4,6 +4,7 @@ import json
 import os
 
 from .api import DexScreenerClient, DexScreenerError
+from .nansen import NansenClient, NansenError
 
 DEFAULT_WATCHLIST_PATH = os.path.join(os.path.expanduser("~"), ".ani-price-watchlist.json")
 
@@ -158,6 +159,96 @@ class PriceTracker:
                     "error": str(e),
                 })
         return results
+
+    # ── Nansen Screener ─────────────────────────────────────────────
+
+    def screener(self, api_key, chains, **kwargs):
+        """Run the Nansen Token Screener and return results.
+
+        Args:
+            api_key: Nansen API key.
+            chains: List of chain names.
+            **kwargs: Forwarded to NansenClient.token_screener().
+
+        Returns:
+            Dict with "tokens" list and "pagination" info.
+        """
+        client = NansenClient(api_key)
+        result = client.token_screener(chains, **kwargs)
+        data = result.get("data") or []
+        pagination = result.get("pagination") or {}
+        tokens = [self._summarize_screener_token(t) for t in data]
+        return {"tokens": tokens, "pagination": pagination}
+
+    @staticmethod
+    def _summarize_screener_token(token):
+        """Normalize a Nansen screener token into a summary dict."""
+        return {
+            "chain": token.get("chain", ""),
+            "address": token.get("token_address", ""),
+            "symbol": token.get("token_symbol", "???"),
+            "tokenAgeDays": token.get("token_age_days"),
+            "priceUsd": token.get("price_usd"),
+            "priceChange": token.get("price_change"),
+            "marketCap": token.get("market_cap_usd"),
+            "fdv": token.get("fdv"),
+            "fdvMcRatio": token.get("fdv_mc_ratio"),
+            "liquidityUsd": token.get("liquidity"),
+            "volume": token.get("volume"),
+            "buyVolume": token.get("buy_volume"),
+            "sellVolume": token.get("sell_volume"),
+            "netflow": token.get("netflow"),
+            "inflowFdvRatio": token.get("inflow_fdv_ratio"),
+            "outflowFdvRatio": token.get("outflow_fdv_ratio"),
+        }
+
+    @staticmethod
+    def format_screener_line(info):
+        """Format a screener token as a one-line table row string."""
+        symbol = info.get("symbol", "???")
+        chain = info.get("chain", "")
+        price_str = format_usd(info["priceUsd"]) if info.get("priceUsd") is not None else "N/A"
+        change = format_pct(info.get("priceChange"))
+        mcap = format_volume(info.get("marketCap"))
+        vol = format_volume(info.get("volume"))
+        liq = format_volume(info.get("liquidityUsd"))
+        age = f"{info['tokenAgeDays']}d" if info.get("tokenAgeDays") is not None else "N/A"
+
+        return f"  {symbol:<10} {chain:<10} {price_str:>14} {change:>9} {mcap:>10} {vol:>10} {liq:>10} {age:>6}"
+
+    @staticmethod
+    def format_screener_detail(info):
+        """Format detailed screener token info as a multi-line string."""
+        lines = []
+        lines.append(f"  {info.get('symbol', '???')} on {info.get('chain', 'unknown')}")
+        lines.append(f"  Address: {info.get('address', 'N/A')}")
+        lines.append(f"  Token Age: {info.get('tokenAgeDays', 'N/A')} days")
+        lines.append("")
+
+        price_str = format_usd(info["priceUsd"]) if info.get("priceUsd") is not None else "N/A"
+        lines.append(f"  Price (USD):  {price_str}")
+        lines.append(f"  Price Change: {format_pct(info.get('priceChange'))}")
+        lines.append("")
+
+        lines.append(f"  Market Cap:   {format_volume(info.get('marketCap'))}")
+        lines.append(f"  FDV:          {format_volume(info.get('fdv'))}")
+        if info.get("fdvMcRatio") is not None:
+            lines.append(f"  FDV/MC Ratio: {info['fdvMcRatio']:.2f}x")
+        lines.append(f"  Liquidity:    {format_volume(info.get('liquidityUsd'))}")
+        lines.append("")
+
+        lines.append("  Volume:")
+        lines.append(f"    Total: {format_volume(info.get('volume'))}")
+        lines.append(f"    Buy:   {format_volume(info.get('buyVolume'))}")
+        lines.append(f"    Sell:  {format_volume(info.get('sellVolume'))}")
+        lines.append(f"    Net:   {format_volume(info.get('netflow'))}")
+
+        if info.get("inflowFdvRatio") is not None:
+            lines.append(f"  Inflow/FDV:   {info['inflowFdvRatio']:.4f}")
+        if info.get("outflowFdvRatio") is not None:
+            lines.append(f"  Outflow/FDV:  {info['outflowFdvRatio']:.4f}")
+
+        return "\n".join(lines)
 
     # ── Formatting ─────────────────────────────────────────────────
 

@@ -27,6 +27,30 @@ def _build_parser():
     p_detail.add_argument("chain", help="Chain ID (e.g. ethereum)")
     p_detail.add_argument("pair", help="Pair contract address")
 
+    # ── screener ────────────────────────────────────────────────────
+    p_scr = sub.add_parser("screener", help="Nansen smart-money token screener")
+    p_scr.add_argument("--key", required=True, help="Nansen API key")
+    p_scr.add_argument(
+        "--chains", nargs="+", default=["ethereum", "solana", "base"],
+        help="Chains to screen (default: ethereum solana base)",
+    )
+    p_scr.add_argument("--timeframe", help="Predefined window: 24h, 7d, 30d")
+    p_scr.add_argument("--from", dest="date_from", help="Start date (ISO format)")
+    p_scr.add_argument("--to", dest="date_to", help="End date (ISO format)")
+    p_scr.add_argument("--smart-money", action="store_true", help="Smart money tokens only")
+    p_scr.add_argument("--page", type=int, default=1, help="Page number")
+    p_scr.add_argument("--per-page", type=int, default=10, help="Results per page")
+    p_scr.add_argument("--age-min", type=int, help="Min token age in days")
+    p_scr.add_argument("--age-max", type=int, help="Max token age in days")
+    p_scr.add_argument("--mcap-min", type=float, help="Min market cap (USD)")
+    p_scr.add_argument("--mcap-max", type=float, help="Max market cap (USD)")
+    p_scr.add_argument(
+        "--sort", help="Sort field (e.g. volume, market_cap_usd, price_change)",
+    )
+    p_scr.add_argument(
+        "--order", choices=["ASC", "DESC"], default="DESC", help="Sort direction",
+    )
+
     # ── watch ──────────────────────────────────────────────────────
     p_watch = sub.add_parser("watch", help="Manage your watchlist")
     watch_sub = p_watch.add_subparsers(dest="watch_action")
@@ -62,6 +86,8 @@ def main(argv=None):
             return _cmd_search(tracker, args)
         elif args.command == "detail":
             return _cmd_detail(tracker, args)
+        elif args.command == "screener":
+            return _cmd_screener(tracker, args)
         elif args.command == "watch":
             return _cmd_watch(tracker, args)
     except Exception as e:
@@ -119,6 +145,48 @@ def _cmd_detail(tracker, args):
     print()
     print(tracker.format_detail(info))
     print()
+    return 0
+
+
+def _cmd_screener(tracker, args):
+    order_by = None
+    if args.sort:
+        order_by = [{"field": args.sort, "direction": args.order}]
+
+    result = tracker.screener(
+        api_key=args.key,
+        chains=args.chains,
+        date_from=args.date_from,
+        date_to=args.date_to,
+        timeframe=args.timeframe,
+        page=args.page,
+        per_page=args.per_page,
+        only_smart_money=args.smart_money,
+        token_age_min=args.age_min,
+        token_age_max=args.age_max,
+        market_cap_min=args.mcap_min,
+        market_cap_max=args.mcap_max,
+        order_by=order_by,
+    )
+
+    tokens = result.get("tokens") or []
+    pagination = result.get("pagination") or {}
+
+    if not tokens:
+        print("No tokens found matching the criteria.")
+        return 1
+
+    header = f"  {'Symbol':<10} {'Chain':<10} {'Price':>14} {'Change':>9} {'MCap':>10} {'Volume':>10} {'Liquidity':>10} {'Age':>6}"
+    print(f"\n  Nansen Token Screener — Page {pagination.get('page', args.page)}\n")
+    print(header)
+    print(f"  {'-' * 86}")
+
+    for info in tokens:
+        print(tracker.format_screener_line(info))
+
+    is_last = pagination.get("is_last_page", True)
+    status = "last page" if is_last else f"more results on page {args.page + 1}"
+    print(f"\n  Showing {len(tokens)} tokens ({status}).\n")
     return 0
 
 
